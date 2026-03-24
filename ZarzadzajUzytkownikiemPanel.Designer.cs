@@ -56,7 +56,10 @@
             textbox_numer_lokalu = new TextBox();
             datetimerpicker_data_urodzenia = new DateTimePicker();
             tableLayoutPanel2 = new TableLayoutPanel();
+            btn_anuluj = new Button();
+            btn_potwierdz = new Button();
             tableLayoutPanel1.SuspendLayout();
+            tableLayoutPanel2.SuspendLayout();
             SuspendLayout();
             // 
             // tableLayoutPanel1
@@ -97,25 +100,25 @@
             tableLayoutPanel1.Location = new Point(0, 0);
             tableLayoutPanel1.Name = "tableLayoutPanel1";
             tableLayoutPanel1.RowCount = 19;
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 5.263156F));
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 5.26315641F));
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 5.26315641F));
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 5.26315641F));
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 5.26315641F));
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 5.26315641F));
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 5.26315641F));
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 5.26315641F));
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 5.26315641F));
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 5.26315641F));
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 5.26315641F));
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 5.26315641F));
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 5.26315641F));
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 5.26315641F));
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 5.26315641F));
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 5.26315641F));
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 5.26315641F));
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 5.26315641F));
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 5.26315641F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 5.21137333F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 5.21137333F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 5.21137333F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 5.21137333F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 5.21137333F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 5.21137333F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 5.21137333F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 5.21137333F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 5.21137333F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 5.21137333F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 5.21137333F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 5.21137333F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 5.21137333F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 5.21137333F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 5.21137333F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 5.21137333F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 5.21137333F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 8.178732F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 3.22792554F));
             tableLayoutPanel1.Size = new Size(880, 720);
             tableLayoutPanel1.TabIndex = 0;
             // 
@@ -294,6 +297,7 @@
             textbox_login.Name = "textbox_login";
             textbox_login.Size = new Size(394, 29);
             textbox_login.TabIndex = 1;
+            textbox_login.KeyPress += textbox_login_KeyPress;
             // 
             // textbox_email
             // 
@@ -303,6 +307,7 @@
             textbox_email.Name = "textbox_email";
             textbox_email.Size = new Size(394, 29);
             textbox_email.TabIndex = 15;
+            textbox_email.KeyPress += textbox_email_KeyPress;
             // 
             // textbox_imiona
             // 
@@ -312,6 +317,7 @@
             textbox_imiona.Name = "textbox_imiona";
             textbox_imiona.Size = new Size(394, 29);
             textbox_imiona.TabIndex = 16;
+            textbox_imiona.KeyPress += textbox_imiona_KeyPress;
             // 
             // textbox_nazwisko
             // 
@@ -321,6 +327,7 @@
             textbox_nazwisko.Name = "textbox_nazwisko";
             textbox_nazwisko.Size = new Size(394, 29);
             textbox_nazwisko.TabIndex = 17;
+            textbox_nazwisko.KeyPress += textbox_nazwisko_KeyPress;
             // 
             // textbox_pesel
             // 
@@ -340,7 +347,7 @@
             combobox_plec.DropDownStyle = ComboBoxStyle.DropDownList;
             combobox_plec.Font = new Font("Segoe UI", 12F);
             combobox_plec.FormattingEnabled = true;
-            combobox_plec.Items.AddRange(new object[] { "Mężczyzna", "Kobieta" });
+            combobox_plec.Items.AddRange(new object[] { "Męźczyzna", "Kobieta" });
             combobox_plec.Location = new Point(343, 262);
             combobox_plec.Name = "combobox_plec";
             combobox_plec.Size = new Size(394, 29);
@@ -354,6 +361,7 @@
             textbox_miejscowosc.Name = "textbox_miejscowosc";
             textbox_miejscowosc.Size = new Size(394, 29);
             textbox_miejscowosc.TabIndex = 20;
+            textbox_miejscowosc.KeyPress += textbox_miejscowosc_KeyPress;
             // 
             // textbox_ulica
             // 
@@ -363,6 +371,7 @@
             textbox_ulica.Name = "textbox_ulica";
             textbox_ulica.Size = new Size(394, 29);
             textbox_ulica.TabIndex = 21;
+            textbox_ulica.KeyPress += textbox_ulica_KeyPress;
             // 
             // textbox_numer_posesji
             // 
@@ -372,6 +381,7 @@
             textbox_numer_posesji.Name = "textbox_numer_posesji";
             textbox_numer_posesji.Size = new Size(394, 29);
             textbox_numer_posesji.TabIndex = 22;
+            textbox_numer_posesji.KeyPress += textbox_numer_posesji_KeyPress;
             // 
             // textbox_numer_lokalu
             // 
@@ -381,6 +391,7 @@
             textbox_numer_lokalu.Name = "textbox_numer_lokalu";
             textbox_numer_lokalu.Size = new Size(394, 29);
             textbox_numer_lokalu.TabIndex = 23;
+            textbox_numer_lokalu.KeyPress += textbox_numer_lokalu_KeyPress;
             // 
             // datetimerpicker_data_urodzenia
             // 
@@ -399,14 +410,40 @@
             tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
             tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 20F));
             tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 20F));
+            tableLayoutPanel2.Controls.Add(btn_anuluj, 0, 0);
+            tableLayoutPanel2.Controls.Add(btn_potwierdz, 1, 0);
             tableLayoutPanel2.Dock = DockStyle.Fill;
             tableLayoutPanel2.Location = new Point(143, 632);
             tableLayoutPanel2.Name = "tableLayoutPanel2";
             tableLayoutPanel2.RowCount = 1;
             tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
             tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
-            tableLayoutPanel2.Size = new Size(594, 31);
+            tableLayoutPanel2.Size = new Size(594, 52);
             tableLayoutPanel2.TabIndex = 27;
+            // 
+            // btn_anuluj
+            // 
+            btn_anuluj.Dock = DockStyle.Fill;
+            btn_anuluj.Font = new Font("Segoe UI", 12F);
+            btn_anuluj.Location = new Point(3, 3);
+            btn_anuluj.Name = "btn_anuluj";
+            btn_anuluj.Size = new Size(291, 46);
+            btn_anuluj.TabIndex = 0;
+            btn_anuluj.Text = "Anuluj";
+            btn_anuluj.UseVisualStyleBackColor = true;
+            btn_anuluj.Click += btn_anuluj_Click;
+            // 
+            // btn_potwierdz
+            // 
+            btn_potwierdz.Dock = DockStyle.Fill;
+            btn_potwierdz.Font = new Font("Segoe UI", 12F);
+            btn_potwierdz.Location = new Point(300, 3);
+            btn_potwierdz.Name = "btn_potwierdz";
+            btn_potwierdz.Size = new Size(291, 46);
+            btn_potwierdz.TabIndex = 1;
+            btn_potwierdz.Text = "Potwierdź";
+            btn_potwierdz.UseVisualStyleBackColor = true;
+            btn_potwierdz.Click += btn_potwierdz_Click;
             // 
             // ZarzadzajUzytkownikiemPanel
             // 
@@ -417,6 +454,7 @@
             Size = new Size(880, 720);
             tableLayoutPanel1.ResumeLayout(false);
             tableLayoutPanel1.PerformLayout();
+            tableLayoutPanel2.ResumeLayout(false);
             ResumeLayout(false);
         }
 
@@ -450,5 +488,7 @@
         private MaskedTextBox textbox_kod_pocztowy;
         private MaskedTextBox textbox_numer_telefonu;
         private TableLayoutPanel tableLayoutPanel2;
+        private Button btn_anuluj;
+        private Button btn_potwierdz;
     }
 }

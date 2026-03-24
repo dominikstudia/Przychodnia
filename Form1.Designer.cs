@@ -58,6 +58,7 @@
             przycisk_wyszukaj_uzytkownika.TabIndex = 1;
             przycisk_wyszukaj_uzytkownika.Text = "Wyszukaj użytkownika";
             przycisk_wyszukaj_uzytkownika.UseVisualStyleBackColor = true;
+            przycisk_wyszukaj_uzytkownika.Click += przycisk_wyszukaj_uzytkownika_Click;
             // 
             // przycisk_dodaj_uzytkownika
             // 
