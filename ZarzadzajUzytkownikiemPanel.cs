@@ -203,8 +203,8 @@ namespace Przychodnia
             uzytkownik.Miejscowosc = textbox_miejscowosc.Text;
             uzytkownik.Ulica = textbox_ulica.Text;
             uzytkownik.KodPocztowy = textbox_kod_pocztowy.Text;
-            uzytkownik.NumerPosesji = label_numer_posesji.Text;
-            uzytkownik.NumerLokalu = label_numer_lokalu.Text;
+            uzytkownik.NumerPosesji = textbox_numer_posesji.Text;
+            uzytkownik.NumerLokalu = textbox_numer_lokalu.Text;
 
             if (BazaDanych.DodajLubZaaktualizujUzytkownika(uzytkownik))
             {
