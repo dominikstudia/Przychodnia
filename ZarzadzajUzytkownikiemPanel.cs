@@ -181,24 +181,30 @@ namespace Przychodnia
                 return;
             }
 
-            Uzytkownik uzytkownik = new Uzytkownik
+            Uzytkownik uzytkownik;
+
+            if (_uzytkownik != null)
             {
-                Id = (_uzytkownik == null) ? -1 : _uzytkownik.Id,
-                Login = textbox_login.Text,
-                Imiona = textbox_imiona.Text,
-                Nazwisko = textbox_nazwisko.Text,
-                Email = textbox_email.Text,
-                Pesel = textbox_pesel.Text,
-                CzyMezczyzna = false,
-                DataUrodzenia = datetimerpicker_data_urodzenia.Value,
-                Telefon = textbox_numer_telefonu.Text,
-                Miejscowosc = textbox_miejscowosc.Text,
-                Ulica = textbox_ulica.Text,
-                KodPocztowy = textbox_kod_pocztowy.Text,
-                NumerPosesji = label_numer_posesji.Text,
-                NumerLokalu = label_numer_lokalu.Text,
-                CzyZarchiwizowany = false
-            };
+                uzytkownik = _uzytkownik;
+            } else
+            {
+                uzytkownik = new Uzytkownik();
+                uzytkownik.Id = -1;
+            }
+
+            uzytkownik.Login = textbox_login.Text;
+            uzytkownik.Imiona = textbox_imiona.Text;
+            uzytkownik.Nazwisko = textbox_nazwisko.Text;
+            uzytkownik.Email = textbox_email.Text;
+            uzytkownik.Pesel = textbox_pesel.Text;
+            uzytkownik.CzyMezczyzna = combobox_plec.Text == "Męźczyzna";
+            uzytkownik.DataUrodzenia = datetimerpicker_data_urodzenia.Value;
+            uzytkownik.Telefon = textbox_numer_telefonu.Text;
+            uzytkownik.Miejscowosc = textbox_miejscowosc.Text;
+            uzytkownik.Ulica = textbox_ulica.Text;
+            uzytkownik.KodPocztowy = textbox_kod_pocztowy.Text;
+            uzytkownik.NumerPosesji = label_numer_posesji.Text;
+            uzytkownik.NumerLokalu = label_numer_lokalu.Text;
 
             if (BazaDanych.DodajLubZaaktualizujUzytkownika(uzytkownik))
             {
