@@ -17,6 +17,11 @@ namespace Przychodnia
         public ZarzadzajUzytkownikiemPanel()
         {
             InitializeComponent();
+
+            foreach (var rola in BazaDanych.PobierzWszystkieRole())
+            {
+                checkedlistbox_uprawnienia.Items.Add(rola);
+            }
         }
 
         public void WypelnijDane(Uzytkownik uzytkownik, bool czyTylkoOdczyt)
@@ -29,7 +34,7 @@ namespace Przychodnia
             textbox_nazwisko.Text = uzytkownik.Nazwisko;
 
             textbox_pesel.Text = uzytkownik.Pesel;
-            combobox_plec.SelectedItem = (uzytkownik.CzyMezczyzna) ? "Męźczyzna" : "Kobieta";
+            combobox_plec.SelectedItem = (uzytkownik.CzyMezczyzna) ? "Mężczyzna" : "Kobieta";
             datetimerpicker_data_urodzenia.Value = uzytkownik.DataUrodzenia;
             textbox_numer_telefonu.Text = uzytkownik.Telefon;
 
@@ -38,6 +43,13 @@ namespace Przychodnia
             textbox_kod_pocztowy.Text = uzytkownik.KodPocztowy;
             textbox_numer_posesji.Text = uzytkownik.NumerPosesji;
             textbox_numer_lokalu.Text = uzytkownik.NumerLokalu;
+            for (int i = 0; i < checkedlistbox_uprawnienia.Items.Count; i++)
+            {
+                var rola = (Rola)checkedlistbox_uprawnienia.Items[i];
+                checkedlistbox_uprawnienia.SetItemChecked(i, uzytkownik.IdRol.Contains(rola.Id));
+            }
+
+            if (czyTylkoOdczyt) checkedlistbox_uprawnienia.Enabled = false;
 
             if (czyTylkoOdczyt)
             {
@@ -174,8 +186,14 @@ namespace Przychodnia
                 return;
             }
 
+            if (checkedlistbox_uprawnienia.CheckedItems.Count == 0 && (_uzytkownik == null || !_uzytkownik.CzyZarchiwizowany))
+            {
+                MessageBox.Show("Użytkownik musi mieć co najmniej jedno uprawnienie!", "Błąd", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
             DateTime data = datetimerpicker_data_urodzenia.Value;
-            if (!SprawdzPesel(textbox_pesel.Text, combobox_plec.SelectedItem.ToString() == "Męźczyzna", data))
+            if (!SprawdzPesel(textbox_pesel.Text, combobox_plec.SelectedItem.ToString() == "Mężczyzna", data))
             {
                 MessageBox.Show("Pesel nie zgadza się z datą urodzenia użytkownika lub płcią!", "Błąd", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
@@ -199,7 +217,7 @@ namespace Przychodnia
             uzytkownik.Haslo = textbox_haslo.Text;
             uzytkownik.Email = textbox_email.Text;
             uzytkownik.Pesel = textbox_pesel.Text;
-            uzytkownik.CzyMezczyzna = combobox_plec.Text == "Męźczyzna";
+            uzytkownik.CzyMezczyzna = combobox_plec.Text == "Mężczyzna";
             uzytkownik.DataUrodzenia = datetimerpicker_data_urodzenia.Value;
             uzytkownik.Telefon = textbox_numer_telefonu.Text.Replace("-", "").Replace(" ", "").Trim();
             uzytkownik.Miejscowosc = textbox_miejscowosc.Text;
@@ -207,6 +225,12 @@ namespace Przychodnia
             uzytkownik.KodPocztowy = textbox_kod_pocztowy.Text;
             uzytkownik.NumerPosesji = textbox_numer_posesji.Text;
             uzytkownik.NumerLokalu = textbox_numer_lokalu.Text;
+
+            uzytkownik.IdRol.Clear();
+            foreach (Rola r in checkedlistbox_uprawnienia.CheckedItems)
+            {
+                uzytkownik.IdRol.Add(r.Id);
+            }
 
             if (BazaDanych.DodajLubZaaktualizujUzytkownika(uzytkownik))
             {

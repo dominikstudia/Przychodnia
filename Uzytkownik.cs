@@ -32,8 +32,10 @@ namespace Przychodnia
 
         public string PobierzWszystkieDane()
         {
-            return $"{Login} {Email} {Imiona} {Nazwisko} {Pesel} {(CzyMezczyzna ? "Męźczyzna" : "Kobieta")} {Telefon} {Miejscowosc} {Ulica} {KodPocztowy} {NumerPosesji} {NumerLokalu} {DataUrodzenia.ToString("dd.MM.yyyy")}".ToLower();
+            return $"{Login} {Email} {Imiona} {Nazwisko} {Pesel} {(CzyMezczyzna ? "Mężczyzna" : "Kobieta")} {Telefon} {Miejscowosc} {Ulica} {KodPocztowy} {NumerPosesji} {NumerLokalu} {DataUrodzenia.ToString("dd.MM.yyyy")}".ToLower();
         }
+
+        public List<int> IdRol { get; set; } = new List<int>();
 
     }
 }

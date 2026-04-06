@@ -29,6 +29,8 @@
         private void InitializeComponent()
         {
             panel1 = new Panel();
+            label1 = new Label();
+            combobox_filtr_roli = new ComboBox();
             checkbox_uwzglednienie_zarchwizowanych = new CheckBox();
             btn_szukaj = new Button();
             textbox_wyszukiwanie = new TextBox();
@@ -45,6 +47,8 @@
             // 
             // panel1
             // 
+            panel1.Controls.Add(label1);
+            panel1.Controls.Add(combobox_filtr_roli);
             panel1.Controls.Add(checkbox_uwzglednienie_zarchwizowanych);
             panel1.Controls.Add(btn_szukaj);
             panel1.Controls.Add(textbox_wyszukiwanie);
@@ -53,6 +57,24 @@
             panel1.Name = "panel1";
             panel1.Size = new Size(740, 80);
             panel1.TabIndex = 0;
+            // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Location = new Point(396, 19);
+            label1.Name = "label1";
+            label1.Size = new Size(93, 15);
+            label1.TabIndex = 4;
+            label1.Text = "Filtruj po rolach:";
+            // 
+            // combobox_filtr_roli
+            // 
+            combobox_filtr_roli.DropDownStyle = ComboBoxStyle.DropDownList;
+            combobox_filtr_roli.FormattingEnabled = true;
+            combobox_filtr_roli.Location = new Point(396, 44);
+            combobox_filtr_roli.Name = "combobox_filtr_roli";
+            combobox_filtr_roli.Size = new Size(135, 23);
+            combobox_filtr_roli.TabIndex = 3;
             // 
             // checkbox_uwzglednienie_zarchwizowanych
             // 
@@ -68,9 +90,9 @@
             // btn_szukaj
             // 
             btn_szukaj.Font = new Font("Segoe UI", 12F);
-            btn_szukaj.Location = new Point(523, 19);
+            btn_szukaj.Location = new Point(537, 19);
             btn_szukaj.Name = "btn_szukaj";
-            btn_szukaj.Size = new Size(214, 48);
+            btn_szukaj.Size = new Size(200, 48);
             btn_szukaj.TabIndex = 1;
             btn_szukaj.Text = "Szukaj";
             btn_szukaj.UseVisualStyleBackColor = true;
@@ -182,5 +204,7 @@
         private Button btn_archiwizuj;
         private Button btn_dodaj;
         private DataGridView datagrid_uzytkownicy;
+        private ComboBox combobox_filtr_roli;
+        private Label label1;
     }
 }

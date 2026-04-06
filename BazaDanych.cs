@@ -10,7 +10,7 @@ namespace Przychodnia
 {
     internal class BazaDanych
     {
-        public static readonly string POLACZENIE_STRING = @"Server=(localdb)\Local;Database=Przychodnia;Trusted_Connection=True;TrustServerCertificate=True;";
+        public static readonly string POLACZENIE_STRING = @"Server=KAKUR\SQLEXPRESS01;Database=Przychodnia;Trusted_Connection=True;TrustServerCertificate=True;";
 
         public static BindingList<Uzytkownik> Uzytkownicy { get; set; } = new BindingList<Uzytkownik>();
 
@@ -53,12 +53,47 @@ namespace Przychodnia
                             });
                         }
                     }
+
+                    string kwerendaRole = "SELECT UserID, RoleID FROM UserRoles";
+                    using (var komendaRole = new Microsoft.Data.SqlClient.SqlCommand(kwerendaRole, polaczenie))
+                    using (var czytnikRole = komendaRole.ExecuteReader())
+                    {
+                        while (czytnikRole.Read())
+                        {
+                            int uid = Convert.ToInt32(czytnikRole["UserID"]);
+                            int rid = Convert.ToInt32(czytnikRole["RoleID"]);
+                            var u = Uzytkownicy.FirstOrDefault(x => x.Id == uid);
+                            if (u != null) u.IdRol.Add(rid);
+                        }
+                    }
                 }
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Błąd bazy: " + ex.Message);
             }
+        }
+        public static List<Rola> PobierzWszystkieRole()
+        {
+            List<Rola> role = new List<Rola>();
+            using (var polaczenie = new Microsoft.Data.SqlClient.SqlConnection(POLACZENIE_STRING))
+            {
+                polaczenie.Open();
+                string sql = "SELECT RoleID, RoleName FROM Roles ORDER BY RoleName ASC";
+                using (var cmd = new Microsoft.Data.SqlClient.SqlCommand(sql, polaczenie))
+                using (var czytnik = cmd.ExecuteReader())
+                {
+                    while (czytnik.Read())
+                    {
+                        role.Add(new Rola
+                        {
+                            Id = Convert.ToInt32(czytnik["RoleID"]),
+                            Nazwa = czytnik["RoleName"].ToString()
+                        });
+                    }
+                }
+            }
+            return role;
         }
 
         public static bool DodajLubZaaktualizujUzytkownika(Uzytkownik uzytkownik)
@@ -109,6 +144,28 @@ namespace Przychodnia
                                 cmd.Parameters.AddWithValue("@Arc", uzytkownik.CzyZarchiwizowany);
                                 cmd.Parameters.AddWithValue("@Pass", uzytkownik.Haslo ?? ""); // Aktualizacja hasła
                                 cmd.ExecuteNonQuery();
+                            }
+                        }
+                        // 1. Najpierw usuwamy wszystkie stare przypisania ról dla tego użytkownika
+                        string usunRole = "DELETE FROM UserRoles WHERE UserID=@Id";
+                        using (var cmdUsun = new Microsoft.Data.SqlClient.SqlCommand(usunRole, polaczenie, transakcja))
+                        {
+                            cmdUsun.Parameters.AddWithValue("@Id", uzytkownik.Id);
+                            cmdUsun.ExecuteNonQuery();
+                        }
+
+                        // 2. Następnie przypisujemy nowe role (tylko jeśli konto jest aktywne)
+                        if (!uzytkownik.CzyZarchiwizowany)
+                        {
+                            string dodajRole = "INSERT INTO UserRoles (UserID, RoleID) VALUES (@Uid, @Rid)";
+                            foreach (int rid in uzytkownik.IdRol)
+                            {
+                                using (var cmdDodaj = new Microsoft.Data.SqlClient.SqlCommand(dodajRole, polaczenie, transakcja))
+                                {
+                                    cmdDodaj.Parameters.AddWithValue("@Uid", uzytkownik.Id);
+                                    cmdDodaj.Parameters.AddWithValue("@Rid", rid);
+                                    cmdDodaj.ExecuteNonQuery();
+                                }
                             }
                         }
                         transakcja.Commit();

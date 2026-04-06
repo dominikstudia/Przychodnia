@@ -14,6 +14,12 @@ namespace Przychodnia
         {
             InitializeComponent();
 
+            var roleDoFiltru = BazaDanych.PobierzWszystkieRole();
+            roleDoFiltru.Insert(0, new Rola { Id = 0, Nazwa = "Wszystkie role" });
+            combobox_filtr_roli.DataSource = roleDoFiltru;
+
+            combobox_filtr_roli.SelectedIndexChanged += btn_szukaj_Click;
+
             checkbox_uwzglednienie_zarchwizowanych.Checked = true;
             datagrid_uzytkownicy.DataSource = BazaDanych.Uzytkownicy;
         }
@@ -48,9 +54,24 @@ namespace Przychodnia
             string szukanaFraza = textbox_wyszukiwanie.Text.ToLower().Trim();
             bool czyPokazacZarchiwizowanych = checkbox_uwzglednienie_zarchwizowanych.Checked;
 
-            var przefiltrowani = BazaDanych.Uzytkownicy.Where(u => (czyPokazacZarchiwizowanych || !u.CzyZarchiwizowany) && (string.IsNullOrEmpty(szukanaFraza) || u.PobierzWszystkieDane().Contains(szukanaFraza))).ToList();
+            int wybraneUprawnienieId = 0;
+            if (combobox_filtr_roli.SelectedItem is Rola r)
+            {
+                wybraneUprawnienieId = r.Id;
+            }
+
+            var przefiltrowani = BazaDanych.Uzytkownicy.Where(u =>
+                (czyPokazacZarchiwizowanych || !u.CzyZarchiwizowany) &&
+                (string.IsNullOrEmpty(szukanaFraza) || u.PobierzWszystkieDane().Contains(szukanaFraza)) &&
+                (wybraneUprawnienieId == 0 || u.IdRol.Contains(wybraneUprawnienieId))
+            ).ToList();
 
             datagrid_uzytkownicy.DataSource = new BindingList<Uzytkownik>(przefiltrowani);
+
+            if (przefiltrowani.Count == 0 && wybraneUprawnienieId != 0)
+            {
+                MessageBox.Show("Brak użytkowników posiadających to uprawnienie", "Informacja", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
         }
 
         private void btn_archiwizuj_Click(object sender, EventArgs e)

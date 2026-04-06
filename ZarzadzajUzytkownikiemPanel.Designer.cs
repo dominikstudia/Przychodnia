@@ -60,6 +60,8 @@
             btn_potwierdz = new Button();
             label1 = new Label();
             textbox_haslo = new TextBox();
+            checkedlistbox_uprawnienia = new CheckedListBox();
+            label2 = new Label();
             tableLayoutPanel1.SuspendLayout();
             tableLayoutPanel2.SuspendLayout();
             SuspendLayout();
@@ -100,6 +102,8 @@
             tableLayoutPanel1.Controls.Add(tableLayoutPanel2, 1, 17);
             tableLayoutPanel1.Controls.Add(label1, 1, 5);
             tableLayoutPanel1.Controls.Add(textbox_haslo, 2, 5);
+            tableLayoutPanel1.Controls.Add(checkedlistbox_uprawnienia, 2, 10);
+            tableLayoutPanel1.Controls.Add(label2, 1, 10);
             tableLayoutPanel1.Dock = DockStyle.Fill;
             tableLayoutPanel1.Location = new Point(0, 0);
             tableLayoutPanel1.Name = "tableLayoutPanel1";
@@ -351,7 +355,7 @@
             combobox_plec.DropDownStyle = ComboBoxStyle.DropDownList;
             combobox_plec.Font = new Font("Segoe UI", 12F);
             combobox_plec.FormattingEnabled = true;
-            combobox_plec.Items.AddRange(new object[] { "Męźczyzna", "Kobieta" });
+            combobox_plec.Items.AddRange(new object[] { "Mężczyzna", "Kobieta" });
             combobox_plec.Location = new Point(343, 262);
             combobox_plec.Name = "combobox_plec";
             combobox_plec.Size = new Size(394, 29);
@@ -467,6 +471,23 @@
             textbox_haslo.Size = new Size(394, 29);
             textbox_haslo.TabIndex = 29;
             // 
+            // checkedlistbox_uprawnienia
+            // 
+            checkedlistbox_uprawnienia.FormattingEnabled = true;
+            checkedlistbox_uprawnienia.Location = new Point(343, 373);
+            checkedlistbox_uprawnienia.Name = "checkedlistbox_uprawnienia";
+            checkedlistbox_uprawnienia.Size = new Size(394, 22);
+            checkedlistbox_uprawnienia.TabIndex = 30;
+            // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.Location = new Point(143, 370);
+            label2.Name = "label2";
+            label2.Size = new Size(73, 15);
+            label2.TabIndex = 31;
+            label2.Text = "Uprawnienia";
+            // 
             // ZarzadzajUzytkownikiemPanel
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -514,5 +535,7 @@
         private Button btn_potwierdz;
         private Label label1;
         private TextBox textbox_haslo;
+        private CheckedListBox checkedlistbox_uprawnienia;
+        private Label label2;
     }
 }
