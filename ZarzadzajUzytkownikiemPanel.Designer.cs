@@ -58,6 +58,8 @@
             tableLayoutPanel2 = new TableLayoutPanel();
             btn_anuluj = new Button();
             btn_potwierdz = new Button();
+            label1 = new Label();
+            textbox_haslo = new TextBox();
             tableLayoutPanel1.SuspendLayout();
             tableLayoutPanel2.SuspendLayout();
             SuspendLayout();
@@ -96,6 +98,8 @@
             tableLayoutPanel1.Controls.Add(textbox_numer_lokalu, 2, 15);
             tableLayoutPanel1.Controls.Add(datetimerpicker_data_urodzenia, 2, 8);
             tableLayoutPanel1.Controls.Add(tableLayoutPanel2, 1, 17);
+            tableLayoutPanel1.Controls.Add(label1, 1, 5);
+            tableLayoutPanel1.Controls.Add(textbox_haslo, 2, 5);
             tableLayoutPanel1.Dock = DockStyle.Fill;
             tableLayoutPanel1.Location = new Point(0, 0);
             tableLayoutPanel1.Name = "tableLayoutPanel1";
@@ -140,7 +144,7 @@
             textbox_numer_telefonu.Dock = DockStyle.Fill;
             textbox_numer_telefonu.Font = new Font("Segoe UI", 12F);
             textbox_numer_telefonu.Location = new Point(343, 336);
-            textbox_numer_telefonu.Mask = "000-000-000";
+            textbox_numer_telefonu.Mask = "000000000";
             textbox_numer_telefonu.Name = "textbox_numer_telefonu";
             textbox_numer_telefonu.Size = new Size(394, 29);
             textbox_numer_telefonu.TabIndex = 25;
@@ -445,6 +449,24 @@
             btn_potwierdz.UseVisualStyleBackColor = true;
             btn_potwierdz.Click += btn_potwierdz_Click;
             // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Location = new Point(143, 185);
+            label1.Name = "label1";
+            label1.Size = new Size(37, 15);
+            label1.TabIndex = 28;
+            label1.Text = "Hasło";
+            // 
+            // textbox_haslo
+            // 
+            textbox_haslo.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+            textbox_haslo.Font = new Font("Segoe UI", 12F);
+            textbox_haslo.Location = new Point(343, 189);
+            textbox_haslo.Name = "textbox_haslo";
+            textbox_haslo.Size = new Size(394, 29);
+            textbox_haslo.TabIndex = 29;
+            // 
             // ZarzadzajUzytkownikiemPanel
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -490,5 +512,7 @@
         private TableLayoutPanel tableLayoutPanel2;
         private Button btn_anuluj;
         private Button btn_potwierdz;
+        private Label label1;
+        private TextBox textbox_haslo;
     }
 }

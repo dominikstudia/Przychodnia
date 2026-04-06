@@ -186,7 +186,8 @@ namespace Przychodnia
             if (_uzytkownik != null)
             {
                 uzytkownik = _uzytkownik;
-            } else
+            }
+            else
             {
                 uzytkownik = new Uzytkownik();
                 uzytkownik.Id = -1;
@@ -195,11 +196,12 @@ namespace Przychodnia
             uzytkownik.Login = textbox_login.Text;
             uzytkownik.Imiona = textbox_imiona.Text;
             uzytkownik.Nazwisko = textbox_nazwisko.Text;
+            uzytkownik.Haslo = textbox_haslo.Text;
             uzytkownik.Email = textbox_email.Text;
             uzytkownik.Pesel = textbox_pesel.Text;
             uzytkownik.CzyMezczyzna = combobox_plec.Text == "Męźczyzna";
             uzytkownik.DataUrodzenia = datetimerpicker_data_urodzenia.Value;
-            uzytkownik.Telefon = textbox_numer_telefonu.Text;
+            uzytkownik.Telefon = textbox_numer_telefonu.Text.Replace("-", "").Replace(" ", "").Trim();
             uzytkownik.Miejscowosc = textbox_miejscowosc.Text;
             uzytkownik.Ulica = textbox_ulica.Text;
             uzytkownik.KodPocztowy = textbox_kod_pocztowy.Text;
@@ -219,5 +221,6 @@ namespace Przychodnia
             }
             btn_anuluj_Click(null, null);
         }
+
     }
 }

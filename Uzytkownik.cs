@@ -13,6 +13,7 @@ namespace Przychodnia
         public string Imiona { get; set; }
         public string Nazwisko { get; set; }
 
+        public string Haslo { get; set; }
         public string Pesel { get; set; }
         public bool CzyMezczyzna { get; set; }
         public DateTime DataUrodzenia { get; set; }
