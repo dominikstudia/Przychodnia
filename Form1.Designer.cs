@@ -34,6 +34,7 @@
             panel_informacyjny = new Panel();
             label_ogolny = new Label();
             panel_edycji = new Panel();
+            przycisk_przeglad_uprawnien = new Button();
             panel_boczny.SuspendLayout();
             panel_informacyjny.SuspendLayout();
             SuspendLayout();
@@ -41,6 +42,7 @@
             // panel_boczny
             // 
             panel_boczny.BackColor = SystemColors.ControlDark;
+            panel_boczny.Controls.Add(przycisk_przeglad_uprawnien);
             panel_boczny.Controls.Add(przycisk_wyszukaj_uzytkownika);
             panel_boczny.Controls.Add(przycisk_dodaj_uzytkownika);
             panel_boczny.Dock = DockStyle.Left;
@@ -101,6 +103,17 @@
             panel_edycji.Size = new Size(864, 581);
             panel_edycji.TabIndex = 2;
             // 
+            // przycisk_przeglad_uprawnien
+            // 
+            przycisk_przeglad_uprawnien.Dock = DockStyle.Top;
+            przycisk_przeglad_uprawnien.Location = new Point(0, 140);
+            przycisk_przeglad_uprawnien.Name = "przycisk_przeglad_uprawnien";
+            przycisk_przeglad_uprawnien.Size = new Size(200, 70);
+            przycisk_przeglad_uprawnien.TabIndex = 2;
+            przycisk_przeglad_uprawnien.Text = "Lista Uprawnien";
+            przycisk_przeglad_uprawnien.UseVisualStyleBackColor = true;
+            przycisk_przeglad_uprawnien.Click += przycisk_przeglad_uprawnien_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -125,5 +138,6 @@
         private Panel panel_informacyjny;
         private Label label_ogolny;
         private Panel panel_edycji;
+        private Button przycisk_przeglad_uprawnien;
     }
 }

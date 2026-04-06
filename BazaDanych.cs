@@ -60,6 +60,28 @@ namespace Przychodnia
                 MessageBox.Show("Błąd bazy: " + ex.Message);
             }
         }
+        public static List<Rola> PobierzWszystkieRole()
+        {
+            List<Rola> role = new List<Rola>();
+            using (var polaczenie = new Microsoft.Data.SqlClient.SqlConnection(POLACZENIE_STRING))
+            {
+                polaczenie.Open();
+                string sql = "SELECT RoleID, RoleName FROM Roles";
+                using (var cmd = new Microsoft.Data.SqlClient.SqlCommand(sql, polaczenie))
+                using (var czytnik = cmd.ExecuteReader())
+                {
+                    while (czytnik.Read())
+                    {
+                        role.Add(new Rola
+                        {
+                            Id = Convert.ToInt32(czytnik["RoleID"]),
+                            Nazwa = czytnik["RoleName"].ToString()
+                        });
+                    }
+                }
+            }
+            return role;
+        }
 
         public static bool DodajLubZaaktualizujUzytkownika(Uzytkownik uzytkownik)
         {

@@ -26,5 +26,15 @@ namespace Przychodnia
             panel_edycji.Controls.Add(formularz);
             label_ogolny.Text = "Lista użytkowników";
         }
+
+        private void przycisk_przeglad_uprawnien_Click(object sender, EventArgs e)
+        {
+            panel_edycji.Controls.Clear();
+
+            ListaUprawnienPanel formularz = new ListaUprawnienPanel();
+            formularz.Dock = DockStyle.Fill;
+            panel_edycji.Controls.Add(formularz);
+            label_ogolny.Text = "Lista uprawnień";
+        }
     }
 }
