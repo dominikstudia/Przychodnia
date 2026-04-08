@@ -58,10 +58,10 @@
             tableLayoutPanel2 = new TableLayoutPanel();
             btn_anuluj = new Button();
             btn_potwierdz = new Button();
-            label1 = new Label();
             textbox_haslo = new TextBox();
             checkedlistbox_uprawnienia = new CheckedListBox();
-            label2 = new Label();
+            label_uprawnienia = new Label();
+            lbl_haslo = new Label();
             tableLayoutPanel1.SuspendLayout();
             tableLayoutPanel2.SuspendLayout();
             SuspendLayout();
@@ -73,6 +73,8 @@
             tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 200F));
             tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 400F));
             tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+            tableLayoutPanel1.Controls.Add(lbl_haslo, 1, 5);
+            tableLayoutPanel1.Controls.Add(label_uprawnienia, 1, 10);
             tableLayoutPanel1.Controls.Add(textbox_kod_pocztowy, 2, 13);
             tableLayoutPanel1.Controls.Add(textbox_numer_telefonu, 2, 9);
             tableLayoutPanel1.Controls.Add(label_kod_pocztowy, 1, 13);
@@ -100,10 +102,8 @@
             tableLayoutPanel1.Controls.Add(textbox_numer_lokalu, 2, 15);
             tableLayoutPanel1.Controls.Add(datetimerpicker_data_urodzenia, 2, 8);
             tableLayoutPanel1.Controls.Add(tableLayoutPanel2, 1, 17);
-            tableLayoutPanel1.Controls.Add(label1, 1, 5);
             tableLayoutPanel1.Controls.Add(textbox_haslo, 2, 5);
             tableLayoutPanel1.Controls.Add(checkedlistbox_uprawnienia, 2, 10);
-            tableLayoutPanel1.Controls.Add(label2, 1, 10);
             tableLayoutPanel1.Dock = DockStyle.Fill;
             tableLayoutPanel1.Location = new Point(0, 0);
             tableLayoutPanel1.Name = "tableLayoutPanel1";
@@ -453,15 +453,6 @@
             btn_potwierdz.UseVisualStyleBackColor = true;
             btn_potwierdz.Click += btn_potwierdz_Click;
             // 
-            // label1
-            // 
-            label1.AutoSize = true;
-            label1.Location = new Point(143, 185);
-            label1.Name = "label1";
-            label1.Size = new Size(37, 15);
-            label1.TabIndex = 28;
-            label1.Text = "Hasło";
-            // 
             // textbox_haslo
             // 
             textbox_haslo.Anchor = AnchorStyles.Left | AnchorStyles.Right;
@@ -479,14 +470,27 @@
             checkedlistbox_uprawnienia.Size = new Size(394, 22);
             checkedlistbox_uprawnienia.TabIndex = 30;
             // 
-            // label2
+            // label_uprawnienia
             // 
-            label2.AutoSize = true;
-            label2.Location = new Point(143, 370);
-            label2.Name = "label2";
-            label2.Size = new Size(73, 15);
-            label2.TabIndex = 31;
-            label2.Text = "Uprawnienia";
+            label_uprawnienia.Dock = DockStyle.Fill;
+            label_uprawnienia.Font = new Font("Segoe UI", 12F);
+            label_uprawnienia.Location = new Point(143, 370);
+            label_uprawnienia.Name = "label_uprawnienia";
+            label_uprawnienia.Size = new Size(194, 37);
+            label_uprawnienia.TabIndex = 32;
+            label_uprawnienia.Text = "Uprawnienia";
+            label_uprawnienia.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // lbl_haslo
+            // 
+            lbl_haslo.Dock = DockStyle.Fill;
+            lbl_haslo.Font = new Font("Segoe UI", 12F);
+            lbl_haslo.Location = new Point(143, 185);
+            lbl_haslo.Name = "lbl_haslo";
+            lbl_haslo.Size = new Size(194, 37);
+            lbl_haslo.TabIndex = 33;
+            lbl_haslo.Text = "Hasło";
+            lbl_haslo.TextAlign = ContentAlignment.MiddleRight;
             // 
             // ZarzadzajUzytkownikiemPanel
             // 
@@ -533,9 +537,9 @@
         private TableLayoutPanel tableLayoutPanel2;
         private Button btn_anuluj;
         private Button btn_potwierdz;
-        private Label label1;
         private TextBox textbox_haslo;
         private CheckedListBox checkedlistbox_uprawnienia;
-        private Label label2;
+        private Label lbl_haslo;
+        private Label label_uprawnienia;
     }
 }
