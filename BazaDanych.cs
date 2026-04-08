@@ -183,7 +183,18 @@ namespace Przychodnia
 
         public static bool ZaarchiwizujUzytkownika(Uzytkownik wybrany)
         {
+            wybrany.Imiona = "Zarchiwizowane";
+            wybrany.Nazwisko = "Dane";
+            wybrany.Email = $"brak_{wybrany.Id}@danych.pl";
+            wybrany.Pesel = wybrany.Id.ToString().PadLeft(11, '0');
+            wybrany.Telefon = "";
+            wybrany.Miejscowosc = "";
+            wybrany.Ulica = "";
+            wybrany.KodPocztowy = "";
+            wybrany.NumerPosesji = "";
+            wybrany.NumerLokalu = "";
             wybrany.CzyZarchiwizowany = true;
+
             return DodajLubZaaktualizujUzytkownika(wybrany);
         }
     }
