@@ -10,7 +10,7 @@ namespace Przychodnia
 {
     internal class BazaDanych
     {
-        public static readonly string POLACZENIE_STRING = @"Server=KAKUR\SQLEXPRESS01;Database=Przychodnia;Trusted_Connection=True;TrustServerCertificate=True;";
+        public static readonly string POLACZENIE_STRING = @"Server=localhost\SQLEXPRESS;Database=Przychodnia;Trusted_Connection=True;TrustServerCertificate=True;";
 
         public static BindingList<Uzytkownik> Uzytkownicy { get; set; } = new BindingList<Uzytkownik>();
 
@@ -196,6 +196,29 @@ namespace Przychodnia
             wybrany.CzyZarchiwizowany = true;
 
             return DodajLubZaaktualizujUzytkownika(wybrany);
+        }
+
+        public static void MasowoNadajRole(List<Uzytkownik> zaznaczeni, int id)
+        {
+            foreach (Uzytkownik uzytkownik in zaznaczeni) {
+                if (!uzytkownik.IdRol.Contains(id))
+                {
+                    uzytkownik.IdRol.Add(id);
+                    DodajLubZaaktualizujUzytkownika(uzytkownik);
+                }
+            }
+        }
+
+        public static void MasowoZabierzRole(List<Uzytkownik> zaznaczeni, int id)
+        {
+            foreach (Uzytkownik uzytkownik in zaznaczeni)
+            {
+                if (uzytkownik.IdRol.Contains(id))
+                {
+                    uzytkownik.IdRol.Remove(id);
+                    DodajLubZaaktualizujUzytkownika(uzytkownik); 
+                }
+            }
         }
     }
 }
