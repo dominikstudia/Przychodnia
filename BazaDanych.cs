@@ -220,5 +220,11 @@ namespace Przychodnia
                 }
             }
         }
+
+        public static Boolean SprobujZalogowac(String login, String haslo)
+        {
+            // TODO ZAPYTANIE DO BAZY DANYCH
+            return true;
+        }
     }
 }

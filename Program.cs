@@ -12,8 +12,6 @@ namespace Przychodnia
             // see https://aka.ms/applicationconfiguration.
             ApplicationConfiguration.Initialize();
 
-            BazaDanych.ZaladujBazeDanych();
-
             Application.Run(new Form1());
         }
     }

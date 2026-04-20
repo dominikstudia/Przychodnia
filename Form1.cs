@@ -5,6 +5,30 @@ namespace Przychodnia
         public Form1()
         {
             InitializeComponent();
+            PokazEkranLogowania();
+        }
+
+        private void PokazEkranLogowania()
+        {
+            panel_boczny.Enabled = false;
+            panel_boczny.Visible = false;
+            panel_edycji.Controls.Clear();
+
+            LogowaniePanel formularz = new LogowaniePanel();
+            formularz.Dock = DockStyle.Fill;
+            panel_edycji.Controls.Add(formularz);
+            label_ogolny.Text = "Logowanie do systemu";
+        }
+
+        public void OdblokujSystemPoZalogowaniu()
+        {
+            BazaDanych.ZaladujBazeDanych();
+
+            panel_boczny.Enabled = true;
+            panel_boczny.Visible = true;
+            panel_edycji.Controls.Clear();
+
+            label_ogolny.Text = "PRZYCHODNIA";
         }
 
         private void przycisk_dodaj_uzytkownika_Click(object sender, EventArgs e)
