@@ -21,7 +21,7 @@ namespace Przychodnia
             combobox_filtr_roli.SelectedIndexChanged += btn_szukaj_Click;
 
             checkbox_uwzglednienie_zarchwizowanych.Checked = true;
-            datagrid_uzytkownicy.DataSource = BazaDanych.Uzytkownicy;
+            UstawDataGrid(BazaDanych.Uzytkownicy);
         }
 
         private void StworzOknoFormularza(string naglowek, Uzytkownik? uzytkownik, bool czyTylkoOdczyt)
@@ -39,7 +39,21 @@ namespace Przychodnia
             okno.Controls.Add(panel);
             okno.ShowDialog();
 
-            datagrid_uzytkownicy.DataSource = BazaDanych.Uzytkownicy;
+            UstawDataGrid(BazaDanych.Uzytkownicy);
+        }
+
+        private void UstawDataGrid(BindingList<Uzytkownik> lista)
+        {
+            datagrid_uzytkownicy.DataSource = lista;
+            datagrid_uzytkownicy.Columns["Haslo"].Visible = false;
+            datagrid_uzytkownicy.Columns["NumerPosesji"].Visible = false;
+            datagrid_uzytkownicy.Columns["NumerLokalu"].Visible = false;
+            datagrid_uzytkownicy.Columns["KodPocztowy"].Visible = false;
+            datagrid_uzytkownicy.Columns["CzyMezczyzna"].Visible = false;
+
+            datagrid_uzytkownicy.Columns["CzyZarchiwizowany"].HeaderText = "Zarchiwizowany";
+            datagrid_uzytkownicy.Columns["DataUrodzenia"].HeaderText = "Data urodzenia";
+
         }
 
         ///
@@ -66,7 +80,7 @@ namespace Przychodnia
                 (wybraneUprawnienieId == 0 || u.IdRol.Contains(wybraneUprawnienieId))
             ).ToList();
 
-            datagrid_uzytkownicy.DataSource = new BindingList<Uzytkownik>(przefiltrowani);
+            UstawDataGrid(new BindingList<Uzytkownik>(przefiltrowani));
 
             if (przefiltrowani.Count == 0 && wybraneUprawnienieId != 0)
             {

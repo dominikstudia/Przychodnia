@@ -186,6 +186,13 @@ namespace Przychodnia
                 return;
             }
 
+            if (!Regex.IsMatch(textbox_haslo.Text, RegexPatterny.HASLO))
+            {
+                MessageBox.Show("Hasło nie spełnia wymagań bezpieczeństwa.");
+                return;
+            }
+
+
             if (checkedlistbox_uprawnienia.CheckedItems.Count == 0 && (_uzytkownik == null || !_uzytkownik.CzyZarchiwizowany))
             {
                 MessageBox.Show("Użytkownik musi mieć co najmniej jedno uprawnienie!", "Błąd", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -246,5 +253,24 @@ namespace Przychodnia
             btn_anuluj_Click(null, null);
         }
 
+        private void btn_wygeneruj_Click(object sender, EventArgs e)
+        {
+            string litery = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            string cyfry = "0123456789";
+            string znakiSpecjalne = "!@#$%^&*()_+-=[]{}|;:,.<>?";
+
+            Random random = new Random();
+
+            StringBuilder haslo = new StringBuilder();
+            for (int i = 0; i < 3; i++) haslo.Append(litery.ToUpper()[random.Next(litery.Length)]);
+            for (int i = 0; i < 3; i++) haslo.Append(litery.ToLower()[random.Next(litery.Length)]);
+            for (int i = 0; i < 2; i++) haslo.Append(cyfry[random.Next(cyfry.Length)]);
+            for (int i = 0; i < 2; i++) haslo.Append(znakiSpecjalne[random.Next(znakiSpecjalne.Length)]);
+
+            textbox_haslo.Text = haslo.ToString();
+            Clipboard.SetText(haslo.ToString());
+
+            MessageBox.Show("Wygenerowano nowe hasło i skopiowno je do schowka.");
+        }
     }
 }

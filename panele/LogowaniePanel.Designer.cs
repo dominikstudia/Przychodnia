@@ -28,22 +28,22 @@
         /// </summary>
         private void InitializeComponent()
         {
-            textbox_email = new TextBox();
+            textbox_login = new TextBox();
             btn_zaloguj = new Button();
-            lbl_email = new Label();
+            lbl_login = new Label();
             lbl_haslo = new Label();
             textbox_haslo = new TextBox();
             panel1 = new Panel();
             panel1.SuspendLayout();
             SuspendLayout();
             // 
-            // textbox_email
+            // textbox_login
             // 
-            textbox_email.Font = new Font("Segoe UI", 14F);
-            textbox_email.Location = new Point(21, 63);
-            textbox_email.Name = "textbox_email";
-            textbox_email.Size = new Size(481, 32);
-            textbox_email.TabIndex = 0;
+            textbox_login.Font = new Font("Segoe UI", 14F);
+            textbox_login.Location = new Point(21, 63);
+            textbox_login.Name = "textbox_login";
+            textbox_login.Size = new Size(481, 32);
+            textbox_login.TabIndex = 0;
             // 
             // btn_zaloguj
             // 
@@ -56,16 +56,15 @@
             btn_zaloguj.UseVisualStyleBackColor = true;
             btn_zaloguj.Click += btn_zaloguj_Click;
             // 
-            // lbl_email
+            // lbl_login
             // 
-            lbl_email.AutoSize = true;
-            lbl_email.Font = new Font("Segoe UI", 14F);
-            lbl_email.Location = new Point(21, 35);
-            lbl_email.Name = "lbl_email";
-            lbl_email.Size = new Size(59, 25);
-            lbl_email.TabIndex = 2;
-            lbl_email.Text = "Login";
-            lbl_email.Click += lbl_email_Click;
+            lbl_login.AutoSize = true;
+            lbl_login.Font = new Font("Segoe UI", 14F);
+            lbl_login.Location = new Point(21, 35);
+            lbl_login.Name = "lbl_login";
+            lbl_login.Size = new Size(59, 25);
+            lbl_login.TabIndex = 2;
+            lbl_login.Text = "Login";
             // 
             // lbl_haslo
             // 
@@ -91,9 +90,9 @@
             panel1.Anchor = AnchorStyles.None;
             panel1.Controls.Add(textbox_haslo);
             panel1.Controls.Add(lbl_haslo);
-            panel1.Controls.Add(lbl_email);
+            panel1.Controls.Add(lbl_login);
             panel1.Controls.Add(btn_zaloguj);
-            panel1.Controls.Add(textbox_email);
+            panel1.Controls.Add(textbox_login);
             panel1.Location = new Point(137, 25);
             panel1.Name = "panel1";
             panel1.Size = new Size(517, 318);
@@ -113,9 +112,9 @@
 
         #endregion
 
-        private TextBox textbox_email;
+        private TextBox textbox_login;
         private Button btn_zaloguj;
-        private Label lbl_email;
+        private Label lbl_login;
         private Label lbl_haslo;
         private TextBox textbox_haslo;
         private Panel panel1;

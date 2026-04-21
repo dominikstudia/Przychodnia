@@ -13,6 +13,7 @@ namespace Przychodnia
         public static readonly string POLACZENIE_STRING = @"Server=localhost\SQLEXPRESS;Database=Przychodnia;Trusted_Connection=True;TrustServerCertificate=True;";
 
         public static BindingList<Uzytkownik> Uzytkownicy { get; set; } = new BindingList<Uzytkownik>();
+        public static Uzytkownik? ZALOGOWANY_UZYTKOWNIK { get; set; } = null;
 
         public static void ZaladujBazeDanych()
         {
@@ -221,10 +222,56 @@ namespace Przychodnia
             }
         }
 
+
+        // TODO KTÓRE TRZEBA WYKONAĆ
+        // - AKTUALIZACJA BAZY DANYCH [AKTUALNIE BAZA DANYCH NIE ZAPISUJE PESELU, ADRESU, KODU POCZTOWEGO ITP. [NIEKTÓRE ZAPISUJE] - CHYBA ZE JUZ POPRAWIONO,
+        // - ^ A JA NIE MAM AKTUALNEJ]
+        // - ^ plik SQL powinien się gdzieś znaleźć w projekcie np. w folderze "resources"
+        
+        // - Powinniśmy dodać hashowanie haseł [bo w bazie danych mamy pole PasswordHash, a w wczytywaniu i zapisywaniu uzywamy surowego hasla]
+        
+        // - Z modulu 3 jedynego czego nie dodalem to emaile, bo uważam że to bezsensu i przerost formy nad treścią. Jeżeli chcecie, to obgadajcie to z 
+        // - ^ analitykiem, zeby to zrobil jakos inaczej, albo jeżeli chcecie to wprowadźcie te emaile.
+
+        // - Poza tym nie wiem, czy dzialanie ról powinno już działać w tym module [ale wydaje mi się, ze nie]
+        // - bo raczej zalogowany pacjent nie powinien widzieć przycisku "Dodaj uzytkownika", ale to powinno byc w
+        // - analizie, więc nie wiem czy powinniśmy to zrobić na jutro
+
         public static Boolean SprobujZalogowac(String login, String haslo)
         {
-            // TODO ZAPYTANIE DO BAZY DANYCH
-            return true;
+            ZALOGOWANY_UZYTKOWNIK = null;
+            try
+            {
+                using (var polaczenie = new SqlConnection(POLACZENIE_STRING))
+                {
+                    polaczenie.Open();
+
+                    string kwerenda = @"SELECT UserID FROM Users WHERE Login = @Login AND PasswordHash = @Haslo AND IsArchived = 0";
+                    using (var komenda = new SqlCommand(kwerenda, polaczenie))
+                    {
+                        komenda.Parameters.AddWithValue("@Login", login);
+                        komenda.Parameters.AddWithValue("@Haslo", haslo);
+
+                        object wynik = komenda.ExecuteScalar();
+                        if (wynik != null && wynik != DBNull.Value)
+                        {
+                            int zalogowanyId = Convert.ToInt32(wynik);
+
+                            ZaladujBazeDanych();
+                            ZALOGOWANY_UZYTKOWNIK = Uzytkownicy.FirstOrDefault(u => u.Id == zalogowanyId);
+                            if (ZALOGOWANY_UZYTKOWNIK != null)
+                            {
+                                ZALOGOWANY_UZYTKOWNIK.Haslo = haslo;
+                            }
+
+                        }
+                    }
+                }
+            } catch (Exception ex)
+            {
+                MessageBox.Show("Wystąpił błąd podczas logowania: " + ex.Message);
+            }
+            return ZALOGOWANY_UZYTKOWNIK != null;
         }
     }
 }

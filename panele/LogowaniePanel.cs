@@ -10,6 +10,9 @@ namespace Przychodnia
 {
     public partial class LogowaniePanel : UserControl
     {
+
+        private int liczbaNieudanychProb = 0;
+
         public LogowaniePanel()
         {
             InitializeComponent();
@@ -17,23 +20,32 @@ namespace Przychodnia
 
         private void btn_zaloguj_Click(object sender, EventArgs e)
         {
-            string email = textbox_email.Text;
+            string email = textbox_login.Text;
             string haslo = textbox_haslo.Text;
+
+            if (email == "" || haslo == "")
+            {
+                MessageBox.Show("Wprowadź login i hasło");
+                return;
+            }
 
             if (BazaDanych.SprobujZalogowac(email, haslo))
             {
-                Form1 glowneOkno = (Form1)this.FindForm();
-                glowneOkno.OdblokujSystemPoZalogowaniu();
+                liczbaNieudanychProb = 0;
+                ((Form1)this.FindForm()).OdblokujSystemPoZalogowaniu();
             }
             else
             {
+                liczbaNieudanychProb++;
+
+                if (liczbaNieudanychProb == 3)
+                {
+                    MessageBox.Show("Przekroczono limit nieudanych prób logowania");
+                    Application.Exit();
+                    return;
+                }
                 MessageBox.Show("Dane logowania są niepoprawne.");
             }
-        }
-
-        private void lbl_email_Click(object sender, EventArgs e)
-        {
-
         }
     }
 }

@@ -1,3 +1,5 @@
+using Przychodnia.formsy;
+
 namespace Przychodnia
 {
     public partial class Form1 : Form
@@ -22,8 +24,6 @@ namespace Przychodnia
 
         public void OdblokujSystemPoZalogowaniu()
         {
-            BazaDanych.ZaladujBazeDanych();
-
             panel_boczny.Enabled = true;
             panel_boczny.Visible = true;
             panel_edycji.Controls.Clear();
@@ -59,6 +59,24 @@ namespace Przychodnia
             formularz.Dock = DockStyle.Fill;
             panel_edycji.Controls.Add(formularz);
             label_ogolny.Text = "Lista uprawnień";
+        }
+
+        private void btn_wyloguj_Click(object sender, EventArgs e)
+        {
+            DialogResult dialog = MessageBox.Show("Czy na pewno chcesz sie wylogować?", "Potwierdzenie wylogowania", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (dialog == DialogResult.Yes)
+            {
+                PokazEkranLogowania();
+                BazaDanych.ZALOGOWANY_UZYTKOWNIK = null;
+            }
+        }
+
+        private void btn_zmien_haslo_Click(object sender, EventArgs e)
+        {
+            using (var okno = new ZmianaHasla())
+            {
+                okno.ShowDialog();
+            }
         }
     }
 }

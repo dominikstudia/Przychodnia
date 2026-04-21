@@ -62,6 +62,7 @@
             btn_potwierdz = new Button();
             textbox_haslo = new TextBox();
             checkedlistbox_uprawnienia = new CheckedListBox();
+            btn_wygeneruj = new Button();
             tableLayoutPanel1.SuspendLayout();
             tableLayoutPanel2.SuspendLayout();
             SuspendLayout();
@@ -104,6 +105,7 @@
             tableLayoutPanel1.Controls.Add(tableLayoutPanel2, 1, 17);
             tableLayoutPanel1.Controls.Add(textbox_haslo, 2, 5);
             tableLayoutPanel1.Controls.Add(checkedlistbox_uprawnienia, 2, 10);
+            tableLayoutPanel1.Controls.Add(btn_wygeneruj, 3, 5);
             tableLayoutPanel1.Dock = DockStyle.Fill;
             tableLayoutPanel1.Location = new Point(0, 0);
             tableLayoutPanel1.Name = "tableLayoutPanel1";
@@ -483,6 +485,7 @@
             textbox_haslo.Name = "textbox_haslo";
             textbox_haslo.Size = new Size(394, 29);
             textbox_haslo.TabIndex = 29;
+            textbox_haslo.UseSystemPasswordChar = true;
             // 
             // checkedlistbox_uprawnienia
             // 
@@ -494,6 +497,17 @@
             checkedlistbox_uprawnienia.Name = "checkedlistbox_uprawnienia";
             checkedlistbox_uprawnienia.Size = new Size(394, 94);
             checkedlistbox_uprawnienia.TabIndex = 30;
+            // 
+            // btn_wygeneruj
+            // 
+            btn_wygeneruj.Dock = DockStyle.Fill;
+            btn_wygeneruj.Location = new Point(743, 173);
+            btn_wygeneruj.Name = "btn_wygeneruj";
+            btn_wygeneruj.Size = new Size(134, 28);
+            btn_wygeneruj.TabIndex = 34;
+            btn_wygeneruj.Text = "Wygeneruj";
+            btn_wygeneruj.UseVisualStyleBackColor = true;
+            btn_wygeneruj.Click += btn_wygeneruj_Click;
             // 
             // ZarzadzajUzytkownikiemPanel
             // 
@@ -544,5 +558,6 @@
         private CheckedListBox checkedlistbox_uprawnienia;
         private Label lbl_haslo;
         private Label label_uprawnienia;
+        private Button btn_wygeneruj;
     }
 }

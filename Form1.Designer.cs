@@ -29,12 +29,14 @@
         private void InitializeComponent()
         {
             panel_boczny = new Panel();
+            btn_wyloguj = new Button();
+            przycisk_przeglad_uprawnien = new Button();
             przycisk_wyszukaj_uzytkownika = new Button();
             przycisk_dodaj_uzytkownika = new Button();
             panel_informacyjny = new Panel();
             label_ogolny = new Label();
             panel_edycji = new Panel();
-            przycisk_przeglad_uprawnien = new Button();
+            btn_zmien_haslo = new Button();
             panel_boczny.SuspendLayout();
             panel_informacyjny.SuspendLayout();
             SuspendLayout();
@@ -42,6 +44,8 @@
             // panel_boczny
             // 
             panel_boczny.BackColor = SystemColors.ControlDark;
+            panel_boczny.Controls.Add(btn_zmien_haslo);
+            panel_boczny.Controls.Add(btn_wyloguj);
             panel_boczny.Controls.Add(przycisk_przeglad_uprawnien);
             panel_boczny.Controls.Add(przycisk_wyszukaj_uzytkownika);
             panel_boczny.Controls.Add(przycisk_dodaj_uzytkownika);
@@ -50,6 +54,28 @@
             panel_boczny.Name = "panel_boczny";
             panel_boczny.Size = new Size(200, 581);
             panel_boczny.TabIndex = 0;
+            // 
+            // btn_wyloguj
+            // 
+            btn_wyloguj.Dock = DockStyle.Bottom;
+            btn_wyloguj.Location = new Point(0, 511);
+            btn_wyloguj.Name = "btn_wyloguj";
+            btn_wyloguj.Size = new Size(200, 70);
+            btn_wyloguj.TabIndex = 3;
+            btn_wyloguj.Text = "Wyloguj";
+            btn_wyloguj.UseVisualStyleBackColor = true;
+            btn_wyloguj.Click += btn_wyloguj_Click;
+            // 
+            // przycisk_przeglad_uprawnien
+            // 
+            przycisk_przeglad_uprawnien.Dock = DockStyle.Top;
+            przycisk_przeglad_uprawnien.Location = new Point(0, 140);
+            przycisk_przeglad_uprawnien.Name = "przycisk_przeglad_uprawnien";
+            przycisk_przeglad_uprawnien.Size = new Size(200, 70);
+            przycisk_przeglad_uprawnien.TabIndex = 2;
+            przycisk_przeglad_uprawnien.Text = "Lista Uprawnien";
+            przycisk_przeglad_uprawnien.UseVisualStyleBackColor = true;
+            przycisk_przeglad_uprawnien.Click += przycisk_przeglad_uprawnien_Click;
             // 
             // przycisk_wyszukaj_uzytkownika
             // 
@@ -103,16 +129,16 @@
             panel_edycji.Size = new Size(864, 581);
             panel_edycji.TabIndex = 2;
             // 
-            // przycisk_przeglad_uprawnien
+            // btn_zmien_haslo
             // 
-            przycisk_przeglad_uprawnien.Dock = DockStyle.Top;
-            przycisk_przeglad_uprawnien.Location = new Point(0, 140);
-            przycisk_przeglad_uprawnien.Name = "przycisk_przeglad_uprawnien";
-            przycisk_przeglad_uprawnien.Size = new Size(200, 70);
-            przycisk_przeglad_uprawnien.TabIndex = 2;
-            przycisk_przeglad_uprawnien.Text = "Lista Uprawnien";
-            przycisk_przeglad_uprawnien.UseVisualStyleBackColor = true;
-            przycisk_przeglad_uprawnien.Click += przycisk_przeglad_uprawnien_Click;
+            btn_zmien_haslo.Dock = DockStyle.Bottom;
+            btn_zmien_haslo.Location = new Point(0, 441);
+            btn_zmien_haslo.Name = "btn_zmien_haslo";
+            btn_zmien_haslo.Size = new Size(200, 70);
+            btn_zmien_haslo.TabIndex = 4;
+            btn_zmien_haslo.Text = "Zmień hasło";
+            btn_zmien_haslo.UseVisualStyleBackColor = true;
+            btn_zmien_haslo.Click += btn_zmien_haslo_Click;
             // 
             // Form1
             // 
@@ -139,5 +165,7 @@
         private Label label_ogolny;
         private Panel panel_edycji;
         private Button przycisk_przeglad_uprawnien;
+        private Button btn_wyloguj;
+        private Button btn_zmien_haslo;
     }
 }
