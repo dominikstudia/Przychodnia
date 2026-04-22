@@ -48,7 +48,12 @@ namespace Przychodnia.formsy
 
             if (!Regex.IsMatch(noweHaslo, RegexPatterny.HASLO))
             {
-                MessageBox.Show("Hasło nie spełnia wymagań bezpieczeństwa.");
+                MessageBox.Show("Hasło nie spełnia wymagań bezpieczeństwa." +
+                    "\nHasło powinno mieć:" +
+                    "\n1. Przynajmniej jedna mała litere (od a do z)" +
+                    "\n2. Przynajmniej jedna wielka litera (od A do Z)" +
+                    "\n3. Przynajmniej jedną cyfre (od 0 do 9)" +
+                    "\n4. Przynajmniej jeden znak specjalny (!@#$%^&*()_-+={[}]|:;\"'<,>.?/)");
                 return;
             }
 

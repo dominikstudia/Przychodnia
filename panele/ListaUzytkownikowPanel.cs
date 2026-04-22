@@ -22,6 +22,14 @@ namespace Przychodnia
 
             checkbox_uwzglednienie_zarchwizowanych.Checked = true;
             UstawDataGrid(BazaDanych.Uzytkownicy);
+
+            Uzytkownik zalogowany = BazaDanych.ZALOGOWANY_UZYTKOWNIK;
+            if (zalogowany != null && zalogowany.SprawdzCzyMaRole("Administrator"))
+            {
+                btn_archiwizuj.Visible = true;
+                btn_dodaj.Visible = true;
+                btn_edytuj.Visible = true;
+            }
         }
 
         private void StworzOknoFormularza(string naglowek, Uzytkownik? uzytkownik, bool czyTylkoOdczyt)

@@ -222,21 +222,6 @@ namespace Przychodnia
             }
         }
 
-
-        // TODO KTÓRE TRZEBA WYKONAĆ
-        // - AKTUALIZACJA BAZY DANYCH [AKTUALNIE BAZA DANYCH NIE ZAPISUJE PESELU, ADRESU, KODU POCZTOWEGO ITP. [NIEKTÓRE ZAPISUJE] - CHYBA ZE JUZ POPRAWIONO,
-        // - ^ A JA NIE MAM AKTUALNEJ]
-        // - ^ plik SQL powinien się gdzieś znaleźć w projekcie np. w folderze "resources"
-        
-        // - Powinniśmy dodać hashowanie haseł [bo w bazie danych mamy pole PasswordHash, a w wczytywaniu i zapisywaniu uzywamy surowego hasla]
-        
-        // - Z modulu 3 jedynego czego nie dodalem to emaile, bo uważam że to bezsensu i przerost formy nad treścią. Jeżeli chcecie, to obgadajcie to z 
-        // - ^ analitykiem, zeby to zrobil jakos inaczej, albo jeżeli chcecie to wprowadźcie te emaile.
-
-        // - Poza tym nie wiem, czy dzialanie ról powinno już działać w tym module [ale wydaje mi się, ze nie]
-        // - bo raczej zalogowany pacjent nie powinien widzieć przycisku "Dodaj uzytkownika", ale to powinno byc w
-        // - analizie, więc nie wiem czy powinniśmy to zrobić na jutro
-
         public static Boolean SprobujZalogowac(String login, String haslo)
         {
             ZALOGOWANY_UZYTKOWNIK = null;

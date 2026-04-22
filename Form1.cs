@@ -1,4 +1,5 @@
 using Przychodnia.formsy;
+using System.Data;
 
 namespace Przychodnia
 {
@@ -29,6 +30,44 @@ namespace Przychodnia
             panel_edycji.Controls.Clear();
 
             label_ogolny.Text = "PRZYCHODNIA";
+
+            Uzytkownik zalogowany = BazaDanych.ZALOGOWANY_UZYTKOWNIK;
+
+
+            if (zalogowany != null)
+            {
+                DodajRoleTest("Administrator");
+                if (zalogowany.SprawdzCzyMaRole("Pacjent"))
+                {
+
+                }
+                if (zalogowany.SprawdzCzyMaRole("Recepcjonista"))
+                {
+                    przycisk_wyszukaj_uzytkownika.Visible = true;
+                }
+                if (zalogowany.SprawdzCzyMaRole("Lekarz")) {
+                    przycisk_wyszukaj_uzytkownika.Visible = true;
+                }
+              
+                if (zalogowany.SprawdzCzyMaRole("Administrator"))
+                {
+                    przycisk_wyszukaj_uzytkownika.Visible = true;
+                    przycisk_dodaj_uzytkownika.Visible = true;
+                    przycisk_przeglad_uprawnien.Visible = true;
+                }
+            }
+        }
+
+        private void DodajRoleTest(String nazwa)
+        {
+            List<Rola> role = BazaDanych.PobierzWszystkieRole();
+            Rola rola = role.FirstOrDefault(r => r.Nazwa == nazwa);
+
+            if (rola != null && BazaDanych.ZALOGOWANY_UZYTKOWNIK != null)
+            {
+                BazaDanych.ZALOGOWANY_UZYTKOWNIK.IdRol.Clear();
+                BazaDanych.ZALOGOWANY_UZYTKOWNIK.IdRol.Add(rola.Id);
+            }
         }
 
         private void przycisk_dodaj_uzytkownika_Click(object sender, EventArgs e)
