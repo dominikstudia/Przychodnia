@@ -32,6 +32,15 @@ namespace Przychodnia
             return $"{Login} {Email} {Imiona} {Nazwisko} {Pesel} {Plec} {Telefon} {Miejscowosc} {Ulica} {KodPocztowy} {NumerPosesji} {NumerLokalu} {DataUrodzenia.ToString("dd.MM.yyyy")}".ToLower();
         }
 
+        public bool SprawdzCzyMaRole(string nazwa)
+        {
+            List<Rola> role = BazaDanych.PobierzWszystkieRole();
+            Rola rola = role.FirstOrDefault(r => r.Nazwa == nazwa);
+
+            return rola != null && IdRol.Contains(rola.Id);
+        }
+
+
         public List<int> IdRol { get; set; } = new List<int>();
     }
 }

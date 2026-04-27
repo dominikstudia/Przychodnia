@@ -86,6 +86,7 @@
             przycisk_przeglad_uprawnien.TabIndex = 2;
             przycisk_przeglad_uprawnien.Text = "Lista Uprawnien";
             przycisk_przeglad_uprawnien.UseVisualStyleBackColor = true;
+            przycisk_przeglad_uprawnien.Visible = false;
             przycisk_przeglad_uprawnien.Click += przycisk_przeglad_uprawnien_Click;
             // 
             // przycisk_wyszukaj_uzytkownika
@@ -97,6 +98,7 @@
             przycisk_wyszukaj_uzytkownika.TabIndex = 1;
             przycisk_wyszukaj_uzytkownika.Text = "Wyszukaj użytkownika";
             przycisk_wyszukaj_uzytkownika.UseVisualStyleBackColor = true;
+            przycisk_wyszukaj_uzytkownika.Visible = false;
             przycisk_wyszukaj_uzytkownika.Click += przycisk_wyszukaj_uzytkownika_Click;
             // 
             // przycisk_dodaj_uzytkownika
@@ -108,6 +110,7 @@
             przycisk_dodaj_uzytkownika.TabIndex = 0;
             przycisk_dodaj_uzytkownika.Text = "Dodaj użytkownika";
             przycisk_dodaj_uzytkownika.UseVisualStyleBackColor = true;
+            przycisk_dodaj_uzytkownika.Visible = false;
             przycisk_dodaj_uzytkownika.Click += przycisk_dodaj_uzytkownika_Click;
             // 
             // panel_informacyjny

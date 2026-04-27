@@ -54,6 +54,7 @@ namespace Przychodnia
             if (czyTylkoOdczyt)
             {
                 ZablokujWszystkiePola(this.Controls);
+                btn_wygeneruj.Visible = false;
                 btn_anuluj.Text = "Powrót";
                 btn_potwierdz.Visible = false;
             }

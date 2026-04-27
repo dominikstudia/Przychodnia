@@ -100,17 +100,18 @@
             // 
             // btn_edytuj
             // 
-            btn_edytuj.Location = new Point(569, 14);
+            btn_edytuj.Location = new Point(396, 14);
             btn_edytuj.Name = "btn_edytuj";
             btn_edytuj.Size = new Size(168, 54);
             btn_edytuj.TabIndex = 3;
             btn_edytuj.Text = "Edytuj użytkownika";
             btn_edytuj.UseVisualStyleBackColor = true;
+            btn_edytuj.Visible = false;
             btn_edytuj.Click += btn_edytuj_Click;
             // 
             // btn_podglad_szczegolow
             // 
-            btn_podglad_szczegolow.Location = new Point(395, 14);
+            btn_podglad_szczegolow.Location = new Point(569, 14);
             btn_podglad_szczegolow.Name = "btn_podglad_szczegolow";
             btn_podglad_szczegolow.Size = new Size(168, 54);
             btn_podglad_szczegolow.TabIndex = 2;
@@ -126,6 +127,7 @@
             btn_archiwizuj.TabIndex = 1;
             btn_archiwizuj.Text = "Archiwzuj użytkownika";
             btn_archiwizuj.UseVisualStyleBackColor = true;
+            btn_archiwizuj.Visible = false;
             btn_archiwizuj.Click += btn_archiwizuj_Click;
             // 
             // btn_dodaj
@@ -137,6 +139,7 @@
             btn_dodaj.TabIndex = 0;
             btn_dodaj.Text = "Dodaj użytkownika";
             btn_dodaj.UseVisualStyleBackColor = true;
+            btn_dodaj.Visible = false;
             btn_dodaj.Click += btn_dodaj_Click;
             // 
             // datagrid_uzytkownicy

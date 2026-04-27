@@ -1,4 +1,5 @@
 using Przychodnia.formsy;
+using System.Data;
 
 namespace Przychodnia
 {
