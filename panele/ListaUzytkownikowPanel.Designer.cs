@@ -29,8 +29,6 @@
         private void InitializeComponent()
         {
             panel1 = new Panel();
-            label1 = new Label();
-            combobox_filtr_roli = new ComboBox();
             checkbox_uwzglednienie_zarchwizowanych = new CheckBox();
             btn_szukaj = new Button();
             textbox_wyszukiwanie = new TextBox();
@@ -40,6 +38,7 @@
             btn_archiwizuj = new Button();
             btn_dodaj = new Button();
             datagrid_uzytkownicy = new DataGridView();
+            checkedlistbox_filtr_roli = new CheckedListBox();
             panel1.SuspendLayout();
             panel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)datagrid_uzytkownicy).BeginInit();
@@ -47,34 +46,15 @@
             // 
             // panel1
             // 
-            panel1.Controls.Add(label1);
-            panel1.Controls.Add(combobox_filtr_roli);
+            panel1.Controls.Add(checkedlistbox_filtr_roli);
             panel1.Controls.Add(checkbox_uwzglednienie_zarchwizowanych);
             panel1.Controls.Add(btn_szukaj);
             panel1.Controls.Add(textbox_wyszukiwanie);
             panel1.Dock = DockStyle.Top;
             panel1.Location = new Point(0, 0);
             panel1.Name = "panel1";
-            panel1.Size = new Size(740, 80);
+            panel1.Size = new Size(740, 96);
             panel1.TabIndex = 0;
-            // 
-            // label1
-            // 
-            label1.AutoSize = true;
-            label1.Location = new Point(396, 19);
-            label1.Name = "label1";
-            label1.Size = new Size(93, 15);
-            label1.TabIndex = 4;
-            label1.Text = "Filtruj po rolach:";
-            // 
-            // combobox_filtr_roli
-            // 
-            combobox_filtr_roli.DropDownStyle = ComboBoxStyle.DropDownList;
-            combobox_filtr_roli.FormattingEnabled = true;
-            combobox_filtr_roli.Location = new Point(396, 44);
-            combobox_filtr_roli.Name = "combobox_filtr_roli";
-            combobox_filtr_roli.Size = new Size(135, 23);
-            combobox_filtr_roli.TabIndex = 3;
             // 
             // checkbox_uwzglednienie_zarchwizowanych
             // 
@@ -90,9 +70,9 @@
             // btn_szukaj
             // 
             btn_szukaj.Font = new Font("Segoe UI", 12F);
-            btn_szukaj.Location = new Point(537, 19);
+            btn_szukaj.Location = new Point(537, 13);
             btn_szukaj.Name = "btn_szukaj";
-            btn_szukaj.Size = new Size(200, 48);
+            btn_szukaj.Size = new Size(200, 76);
             btn_szukaj.TabIndex = 1;
             btn_szukaj.Text = "Szukaj";
             btn_szukaj.UseVisualStyleBackColor = true;
@@ -167,14 +147,22 @@
             datagrid_uzytkownicy.BackgroundColor = SystemColors.Control;
             datagrid_uzytkownicy.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             datagrid_uzytkownicy.Dock = DockStyle.Fill;
-            datagrid_uzytkownicy.Location = new Point(0, 80);
+            datagrid_uzytkownicy.Location = new Point(0, 96);
             datagrid_uzytkownicy.MultiSelect = false;
             datagrid_uzytkownicy.Name = "datagrid_uzytkownicy";
             datagrid_uzytkownicy.ReadOnly = true;
             datagrid_uzytkownicy.RowHeadersVisible = false;
             datagrid_uzytkownicy.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            datagrid_uzytkownicy.Size = new Size(740, 328);
+            datagrid_uzytkownicy.Size = new Size(740, 312);
             datagrid_uzytkownicy.TabIndex = 2;
+            // 
+            // checkedlistbox_filtr_roli
+            // 
+            checkedlistbox_filtr_roli.FormattingEnabled = true;
+            checkedlistbox_filtr_roli.Location = new Point(395, 13);
+            checkedlistbox_filtr_roli.Name = "checkedlistbox_filtr_roli";
+            checkedlistbox_filtr_roli.Size = new Size(120, 76);
+            checkedlistbox_filtr_roli.TabIndex = 5;
             // 
             // ListaUzytkownikowPanel
             // 
@@ -204,7 +192,6 @@
         private Button btn_archiwizuj;
         private Button btn_dodaj;
         private DataGridView datagrid_uzytkownicy;
-        private ComboBox combobox_filtr_roli;
-        private Label label1;
+        private CheckedListBox checkedlistbox_filtr_roli;
     }
 }

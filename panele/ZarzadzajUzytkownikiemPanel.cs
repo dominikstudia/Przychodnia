@@ -186,10 +186,14 @@ namespace Przychodnia
                 return;
             }
 
-            if (!Regex.IsMatch(textbox_haslo.Text, RegexPatterny.HASLO))
+            if (_uzytkownik == null || !string.IsNullOrEmpty(textbox_haslo.Text))
             {
-                MessageBox.Show("Hasło nie spełnia wymagań bezpieczeństwa.");
-                return;
+                var walidacja = BazaDanych.SprawdzSileHasla(textbox_haslo.Text);
+                if (walidacja.CzySaBledy)
+                {
+                    MessageBox.Show(walidacja.Komunikat, "Hasło zbyt słabe", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
             }
 
 

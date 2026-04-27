@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             panel_boczny = new Panel();
+            btn_zmien_haslo = new Button();
             btn_wyloguj = new Button();
             przycisk_przeglad_uprawnien = new Button();
             przycisk_wyszukaj_uzytkownika = new Button();
@@ -36,7 +37,6 @@
             panel_informacyjny = new Panel();
             label_ogolny = new Label();
             panel_edycji = new Panel();
-            btn_zmien_haslo = new Button();
             panel_boczny.SuspendLayout();
             panel_informacyjny.SuspendLayout();
             SuspendLayout();
@@ -54,6 +54,17 @@
             panel_boczny.Name = "panel_boczny";
             panel_boczny.Size = new Size(200, 581);
             panel_boczny.TabIndex = 0;
+            // 
+            // btn_zmien_haslo
+            // 
+            btn_zmien_haslo.Dock = DockStyle.Bottom;
+            btn_zmien_haslo.Location = new Point(0, 441);
+            btn_zmien_haslo.Name = "btn_zmien_haslo";
+            btn_zmien_haslo.Size = new Size(200, 70);
+            btn_zmien_haslo.TabIndex = 4;
+            btn_zmien_haslo.Text = "Zmień hasło";
+            btn_zmien_haslo.UseVisualStyleBackColor = true;
+            btn_zmien_haslo.Click += btn_zmien_haslo_Click;
             // 
             // btn_wyloguj
             // 
@@ -128,17 +139,6 @@
             panel_edycji.Name = "panel_edycji";
             panel_edycji.Size = new Size(864, 581);
             panel_edycji.TabIndex = 2;
-            // 
-            // btn_zmien_haslo
-            // 
-            btn_zmien_haslo.Dock = DockStyle.Bottom;
-            btn_zmien_haslo.Location = new Point(0, 441);
-            btn_zmien_haslo.Name = "btn_zmien_haslo";
-            btn_zmien_haslo.Size = new Size(200, 70);
-            btn_zmien_haslo.TabIndex = 4;
-            btn_zmien_haslo.Text = "Zmień hasło";
-            btn_zmien_haslo.UseVisualStyleBackColor = true;
-            btn_zmien_haslo.Click += btn_zmien_haslo_Click;
             // 
             // Form1
             // 

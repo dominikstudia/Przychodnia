@@ -34,6 +34,7 @@
             lbl_haslo = new Label();
             textbox_haslo = new TextBox();
             panel1 = new Panel();
+            label_zapomnialem_hasla = new LinkLabel();
             panel1.SuspendLayout();
             SuspendLayout();
             // 
@@ -88,6 +89,7 @@
             // panel1
             // 
             panel1.Anchor = AnchorStyles.None;
+            panel1.Controls.Add(label_zapomnialem_hasla);
             panel1.Controls.Add(textbox_haslo);
             panel1.Controls.Add(lbl_haslo);
             panel1.Controls.Add(lbl_login);
@@ -97,6 +99,18 @@
             panel1.Name = "panel1";
             panel1.Size = new Size(517, 318);
             panel1.TabIndex = 0;
+            // 
+            // label_zapomnialem_hasla
+            // 
+            label_zapomnialem_hasla.AutoSize = true;
+            label_zapomnialem_hasla.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 238);
+            label_zapomnialem_hasla.Location = new Point(21, 285);
+            label_zapomnialem_hasla.Name = "label_zapomnialem_hasla";
+            label_zapomnialem_hasla.Size = new Size(146, 21);
+            label_zapomnialem_hasla.TabIndex = 5;
+            label_zapomnialem_hasla.TabStop = true;
+            label_zapomnialem_hasla.Text = "Zapomniałem hasła";
+            label_zapomnialem_hasla.LinkClicked += label_zapomnialem_hasla_LinkClicked;
             // 
             // LogowaniePanel
             // 
@@ -118,5 +132,6 @@
         private Label lbl_haslo;
         private TextBox textbox_haslo;
         private Panel panel1;
+        private LinkLabel label_zapomnialem_hasla;
     }
 }

@@ -29,6 +29,15 @@ namespace Przychodnia
             panel_edycji.Controls.Clear();
 
             label_ogolny.Text = "PRZYCHODNIA";
+
+            bool czyAdmin = BazaDanych.ZALOGOWANY_UZYTKOWNIK.IdRol.Contains(1);
+            bool czyRecepcjonista = BazaDanych.ZALOGOWANY_UZYTKOWNIK.IdRol.Contains(3);
+
+            przycisk_dodaj_uzytkownika.Visible = czyAdmin;
+            przycisk_przeglad_uprawnien.Visible = czyAdmin;
+
+            przycisk_wyszukaj_uzytkownika.Visible = (czyAdmin || czyRecepcjonista);
+
         }
 
         private void przycisk_dodaj_uzytkownika_Click(object sender, EventArgs e)

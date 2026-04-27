@@ -14,11 +14,15 @@ namespace Przychodnia
         {
             InitializeComponent();
 
-            var roleDoFiltru = BazaDanych.PobierzWszystkieRole();
-            roleDoFiltru.Insert(0, new Rola { Id = 0, Nazwa = "Wszystkie role" });
-            combobox_filtr_roli.DataSource = roleDoFiltru;
+            foreach (var rola in BazaDanych.PobierzWszystkieRole())
+            {
+                checkedlistbox_filtr_roli.Items.Add(rola);
+            }
 
-            combobox_filtr_roli.SelectedIndexChanged += btn_szukaj_Click;
+            checkedlistbox_filtr_roli.ItemCheck += (s, e) =>
+            {
+                this.BeginInvoke((MethodInvoker)(() => btn_szukaj_Click(null, null)));
+            };
 
             checkbox_uwzglednienie_zarchwizowanych.Checked = true;
             UstawDataGrid(BazaDanych.Uzytkownicy);
@@ -45,15 +49,25 @@ namespace Przychodnia
         private void UstawDataGrid(BindingList<Uzytkownik> lista)
         {
             datagrid_uzytkownicy.DataSource = lista;
-            datagrid_uzytkownicy.Columns["Haslo"].Visible = false;
-            datagrid_uzytkownicy.Columns["NumerPosesji"].Visible = false;
-            datagrid_uzytkownicy.Columns["NumerLokalu"].Visible = false;
-            datagrid_uzytkownicy.Columns["KodPocztowy"].Visible = false;
-            datagrid_uzytkownicy.Columns["CzyMezczyzna"].Visible = false;
 
-            datagrid_uzytkownicy.Columns["CzyZarchiwizowany"].HeaderText = "Zarchiwizowany";
-            datagrid_uzytkownicy.Columns["DataUrodzenia"].HeaderText = "Data urodzenia";
+            if (datagrid_uzytkownicy.Columns["Haslo"] != null) datagrid_uzytkownicy.Columns["Haslo"].Visible = false;
+            if (datagrid_uzytkownicy.Columns["NumerPosesji"] != null) datagrid_uzytkownicy.Columns["NumerPosesji"].Visible = false;
+            if (datagrid_uzytkownicy.Columns["NumerLokalu"] != null) datagrid_uzytkownicy.Columns["NumerLokalu"].Visible = false;
+            if (datagrid_uzytkownicy.Columns["KodPocztowy"] != null) datagrid_uzytkownicy.Columns["KodPocztowy"].Visible = false;
+            if (datagrid_uzytkownicy.Columns["CzyMezczyzna"] != null) datagrid_uzytkownicy.Columns["CzyMezczyzna"].Visible = false;
 
+
+            if (datagrid_uzytkownicy.Columns["Plec"] != null)
+            {
+                datagrid_uzytkownicy.Columns["Plec"].HeaderText = "Płeć";
+                datagrid_uzytkownicy.Columns["Plec"].DisplayIndex = 7;
+            }
+
+            if (datagrid_uzytkownicy.Columns["CzyZarchiwizowany"] != null)
+                datagrid_uzytkownicy.Columns["CzyZarchiwizowany"].HeaderText = "Zarchiwizowany";
+
+            if (datagrid_uzytkownicy.Columns["DataUrodzenia"] != null)
+                datagrid_uzytkownicy.Columns["DataUrodzenia"].HeaderText = "Data urodzenia";
         }
 
         ///
@@ -68,23 +82,24 @@ namespace Przychodnia
             string szukanaFraza = textbox_wyszukiwanie.Text.ToLower().Trim();
             bool czyPokazacZarchiwizowanych = checkbox_uwzglednienie_zarchwizowanych.Checked;
 
-            int wybraneUprawnienieId = 0;
-            if (combobox_filtr_roli.SelectedItem is Rola r)
+            List<int> wybraneRoleIds = new List<int>();
+            foreach (Rola r in checkedlistbox_filtr_roli.CheckedItems)
             {
-                wybraneUprawnienieId = r.Id;
+                wybraneRoleIds.Add(r.Id);
             }
 
             var przefiltrowani = BazaDanych.Uzytkownicy.Where(u =>
                 (czyPokazacZarchiwizowanych || !u.CzyZarchiwizowany) &&
                 (string.IsNullOrEmpty(szukanaFraza) || u.PobierzWszystkieDane().Contains(szukanaFraza)) &&
-                (wybraneUprawnienieId == 0 || u.IdRol.Contains(wybraneUprawnienieId))
+
+                (wybraneRoleIds.Count == 0 || u.IdRol.Any(id => wybraneRoleIds.Contains(id)))
             ).ToList();
 
             UstawDataGrid(new BindingList<Uzytkownik>(przefiltrowani));
 
-            if (przefiltrowani.Count == 0 && wybraneUprawnienieId != 0)
+            if (przefiltrowani.Count == 0 && wybraneRoleIds.Count > 0)
             {
-                MessageBox.Show("Brak użytkowników posiadających to uprawnienie", "Informacja", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("Brak użytkowników spełniających wybrane kryteria.", "Informacja", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 

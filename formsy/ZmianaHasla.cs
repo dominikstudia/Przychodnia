@@ -46,9 +46,10 @@ namespace Przychodnia.formsy
                 return;
             }
 
-            if (!Regex.IsMatch(noweHaslo, RegexPatterny.HASLO))
+            var walidacja = BazaDanych.SprawdzSileHasla(noweHaslo);
+            if (walidacja.CzySaBledy)
             {
-                MessageBox.Show("Hasło nie spełnia wymagań bezpieczeństwa.");
+                MessageBox.Show(walidacja.Komunikat, "Hasło zbyt słabe", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
