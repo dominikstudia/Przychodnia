@@ -31,13 +31,16 @@ namespace Przychodnia
             }
         }
 
-        public static (bool CzySaBledy, string Komunikat) SprawdzSileHasla(string haslo)
+        public static (bool CzySaBledy, string Komunikat) SprawdzSileHasla(string haslo, string login = "")
         {
             if (string.IsNullOrEmpty(haslo)) return (true, "Hasło nie może być puste.");
 
             List<string> bledy = new List<string>();
 
             if (haslo.Length < 8) bledy.Add("- jest za krótkie (minimum 8 znaków)");
+            if (haslo.Length > 15) bledy.Add("- jest za długie (maksymalnie 15 znaków)");
+            if (!string.IsNullOrEmpty(login) && haslo.Equals(login, StringComparison.OrdinalIgnoreCase))
+                bledy.Add("- nie może być takie samo jak login użytkownika");
             if (!haslo.Any(char.IsUpper)) bledy.Add("- nie zawiera wielkiej litery");
             if (!haslo.Any(char.IsLower)) bledy.Add("- nie zawiera małej litery");
             if (!haslo.Any(char.IsDigit)) bledy.Add("- nie zawiera cyfry");
@@ -390,7 +393,7 @@ namespace Przychodnia
             }
         }
 
-        public static (bool Sukces, string Komunikat) ZresetujHaslo(string email)
+        public static (bool Sukces, string Komunikat) ZresetujHaslo(string login, string email)
         {
             // Walidacja formatu e-mail
             if (string.IsNullOrWhiteSpace(email) || !System.Text.RegularExpressions.Regex.IsMatch(email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
@@ -403,19 +406,19 @@ namespace Przychodnia
                 using (var polaczenie = new Microsoft.Data.SqlClient.SqlConnection(POLACZENIE_STRING))
                 {
                     polaczenie.Open();
-                    // Sprawdzamy, czy użytkownik istnieje
-                    string szukajSql = "SELECT UserID FROM Users WHERE Email = @Email AND IsArchived = 0";
+
+                    string szukajSql = "SELECT UserID FROM Users WHERE Login = @Login AND Email = @Email AND IsArchived = 0";
                     int userId = 0;
                     using (var cmd = new Microsoft.Data.SqlClient.SqlCommand(szukajSql, polaczenie))
                     {
+                        cmd.Parameters.AddWithValue("@Login", login); 
                         cmd.Parameters.AddWithValue("@Email", email);
                         var wynik = cmd.ExecuteScalar();
-                        if (wynik == null) return (false, "Brak aktywnego konta przypisanego do tego adresu e-mail.");
+                        if (wynik == null) return (false, "Nie znaleziono aktywnego konta z podanym loginem i adresem e-mail.");
                         userId = Convert.ToInt32(wynik);
                     }
 
-                    // Generujemy jednorazowe hasło (np. Temp4281!)
-                    string noweHaslo = "Temp" + new Random().Next(1000, 9999) + "!";
+                    string noweHaslo = GenerujSilneHaslo();
 
                     // Zapisujemy nowy Hash i oznaczamy flagę "WymagaZmianyHasla = 1"
                     string updateSql = "UPDATE Users SET PasswordHash = @Hash, WymagaZmianyHasla = 1, FailedLoginAttempts = 0, BlockedUntil = NULL WHERE UserID = @Id";
@@ -451,5 +454,40 @@ namespace Przychodnia
             }
         }
 
+        public static string GenerujSilneHaslo()
+        {
+            const string male = "abcdefghijklmnopqrstuvwxyz";
+            const string duze = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            const string cyfry = "0123456789";
+            const string znaki = "!@#$%^&*()_+-=[]{};:,.<>?";
+
+            Random rnd = new Random();
+            char[] haslo = new char[10];
+
+            for (int i = 0; i < 3; i++) haslo[i] = male[rnd.Next(male.Length)];
+            for (int i = 3; i < 6; i++) haslo[i] = duze[rnd.Next(duze.Length)];
+            for (int i = 6; i < 8; i++) haslo[i] = cyfry[rnd.Next(cyfry.Length)];
+            for (int i = 8; i < 10; i++) haslo[i] = znaki[rnd.Next(znaki.Length)];
+
+            // Składamy hasło w całość
+            string gotoweHaslo = new string(haslo.OrderBy(x => rnd.Next()).ToArray());
+
+            // Automatyczne kopiowanie do schowka z zabezpieczeniem
+            try
+            {
+                System.Windows.Forms.Clipboard.SetText(gotoweHaslo);
+            }
+            catch (Exception ex)
+            {
+                // Wyświetlamy ostrzeżenie, jeśli Windows zablokuje dostęp do schowka
+                System.Windows.Forms.MessageBox.Show(
+                    "Hasło zostało wygenerowane, ale system zablokował automatyczne skopiowanie go do schowka.\nMusisz skopiować je ręcznie.\n\nSzczegóły: " + ex.Message,
+                    "Błąd schowka",
+                    System.Windows.Forms.MessageBoxButtons.OK,
+                    System.Windows.Forms.MessageBoxIcon.Warning);
+            }
+
+            return gotoweHaslo;
+        }
     }
 }

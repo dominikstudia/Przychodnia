@@ -120,26 +120,38 @@ namespace Przychodnia
 
         private void label_zapomnialem_hasla_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            // Tworzymy na szybko małe okienko do pobrania e-maila
+            // Tworzymy okienko do pobrania loginu i e-maila
             Form prompt = new Form()
             {
                 Width = 400,
-                Height = 180,
+                Height = 250,
                 FormBorderStyle = FormBorderStyle.FixedDialog,
                 Text = "Resetowanie hasła",
                 StartPosition = FormStartPosition.CenterScreen,
                 MaximizeBox = false
             };
-            Label lbl = new Label() { Left = 20, Top = 20, Width = 340, Text = "Podaj adres e-mail przypisany do Twojego konta:" };
-            TextBox txtEmail = new TextBox() { Left = 20, Top = 50, Width = 340 };
-            Button btnWyslij = new Button() { Text = "Wyślij kod", Left = 260, Width = 100, Top = 90, DialogResult = DialogResult.OK };
 
-            prompt.Controls.Add(lbl); prompt.Controls.Add(txtEmail); prompt.Controls.Add(btnWyslij);
+            // Pole na Login
+            Label lblLogin = new Label() { Left = 20, Top = 20, Width = 340, Text = "Podaj swój login:" };
+            TextBox txtLogin = new TextBox() { Left = 20, Top = 45, Width = 340 };
+
+            // Pole na E-mail
+            Label lblEmail = new Label() { Left = 20, Top = 80, Width = 340, Text = "Podaj przypisany adres e-mail:" };
+            TextBox txtEmail = new TextBox() { Left = 20, Top = 105, Width = 340 };
+
+            // Przycisk
+            Button btnWyslij = new Button() { Text = "Wyślij kod", Left = 260, Width = 100, Top = 160, DialogResult = DialogResult.OK };
+
+            prompt.Controls.Add(lblLogin);
+            prompt.Controls.Add(txtLogin);
+            prompt.Controls.Add(lblEmail);
+            prompt.Controls.Add(txtEmail);
+            prompt.Controls.Add(btnWyslij);
             prompt.AcceptButton = btnWyslij;
 
             if (prompt.ShowDialog() == DialogResult.OK)
             {
-                var wynik = BazaDanych.ZresetujHaslo(txtEmail.Text.Trim());
+                var wynik = BazaDanych.ZresetujHaslo(txtLogin.Text.Trim(), txtEmail.Text.Trim());
                 if (wynik.Sukces) MessageBox.Show(wynik.Komunikat, "Sukces", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 else MessageBox.Show(wynik.Komunikat, "Błąd", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }

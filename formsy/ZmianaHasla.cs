@@ -46,7 +46,9 @@ namespace Przychodnia.formsy
                 return;
             }
 
-            var walidacja = BazaDanych.SprawdzSileHasla(noweHaslo);
+            string aktualnyLogin = BazaDanych.ZALOGOWANY_UZYTKOWNIK?.Login ?? "";
+
+            var walidacja = BazaDanych.SprawdzSileHasla(noweHaslo, aktualnyLogin);
             if (walidacja.CzySaBledy)
             {
                 MessageBox.Show(walidacja.Komunikat, "Hasło zbyt słabe", MessageBoxButtons.OK, MessageBoxIcon.Warning);
