@@ -5,12 +5,14 @@ using System.ComponentModel;
 using System.Data;
 using System.Linq;
 using System.Windows.Forms;
+using System.Net;
+using System.Net.Mail;
 
 namespace Przychodnia
 {
     internal class BazaDanych
     {
-        public static readonly string POLACZENIE_STRING = @"Server=KAKUR\SQLEXPRESS01;Database=Przychodnia(NOWA);Trusted_Connection=True;TrustServerCertificate=True;";
+        public static readonly string POLACZENIE_STRING = @"Server=KAKUR\SQLEXPRESS01;Database=Przychodnia;Trusted_Connection=True;TrustServerCertificate=True;";
 
         public static BindingList<Uzytkownik> Uzytkownicy { get; set; } = new BindingList<Uzytkownik>();
         public static Uzytkownik? ZALOGOWANY_UZYTKOWNIK { get; set; } = null;
@@ -64,10 +66,9 @@ namespace Przychodnia
                 {
                     polaczenie.Open();
                     string kwerenda = @"
-                            SELECT u.UserID, u.Login, u.FirstName, u.LastName, u.Email, u.IsArchived, u.Phone,
-                                   p.PESEL, p.BirthDate, p.Gender, p.City, p.Street, p.PostalCode, p.HouseNumber, p.ApartmentNumber
-                            FROM Users u
-                            LEFT JOIN Persons p ON u.PersonID = p.PersonID";
+                            SELECT UserID, Login, FirstName, LastName, Email, IsArchived, Phone,
+                                   PESEL, BirthDate, Gender, City, Street, PostalCode, HouseNumber, ApartmentNumber
+                            FROM Users";
 
                     using (var komenda = new Microsoft.Data.SqlClient.SqlCommand(kwerenda, polaczenie))
                     using (var czytnik = komenda.ExecuteReader())
@@ -149,51 +150,51 @@ namespace Przychodnia
                     {
                         if (uzytkownik.Id <= 0) // NOWY UŻYTKOWNIK
                         {
-                            string sqlPerson = @"INSERT INTO Persons (FirstName, LastName, PESEL, BirthDate, Gender, Phone, City, Street, PostalCode, HouseNumber, ApartmentNumber) 
-                                                 OUTPUT INSERTED.PersonID
-                                                 VALUES (@FN, @LN, @Pesel, @BD, @Gen, @Ph, @City, @Street, @Postal, @HN, @AN)";
-                            int nowePersonId;
-                            using (var cmdPerson = new Microsoft.Data.SqlClient.SqlCommand(sqlPerson, polaczenie, transakcja))
-                            {
-                                cmdPerson.Parameters.AddWithValue("@FN", uzytkownik.Imiona ?? "");
-                                cmdPerson.Parameters.AddWithValue("@LN", uzytkownik.Nazwisko ?? "");
-                                cmdPerson.Parameters.AddWithValue("@Pesel", uzytkownik.Pesel ?? "");
-                                cmdPerson.Parameters.AddWithValue("@BD", uzytkownik.DataUrodzenia);
-                                cmdPerson.Parameters.AddWithValue("@Gen", uzytkownik.CzyMezczyzna ? 1 : 0);
-                                cmdPerson.Parameters.AddWithValue("@Ph", uzytkownik.Telefon ?? "");
-                                cmdPerson.Parameters.AddWithValue("@City", uzytkownik.Miejscowosc ?? "");
-                                cmdPerson.Parameters.AddWithValue("@Street", uzytkownik.Ulica ?? "");
-                                cmdPerson.Parameters.AddWithValue("@Postal", uzytkownik.KodPocztowy ?? "");
-                                cmdPerson.Parameters.AddWithValue("@HN", uzytkownik.NumerPosesji ?? "");
-                                cmdPerson.Parameters.AddWithValue("@AN", uzytkownik.NumerLokalu ?? "");
-                                nowePersonId = (int)cmdPerson.ExecuteScalar();
-                            }
-
-                            string sqlUser = @"INSERT INTO Users (Login, FirstName, LastName, Email, Phone, IsArchived, CreatedAt, PasswordHash, PersonID) 
+                            // Zapisujemy wszystko od razu do tabeli Users
+                            string sqlUser = @"INSERT INTO Users (Login, PasswordHash, Email, FirstName, LastName, PESEL, BirthDate, Gender, Phone, City, PostalCode, Street, HouseNumber, ApartmentNumber, IsArchived, CreatedAt, FailedLoginAttempts, WymagaZmianyHasla) 
                                                OUTPUT INSERTED.UserID
-                                               VALUES (@Login, @FirstName, @LastName, @Email, @Phone, @IsArchived, GETDATE(), @Pass, @PersonID)";
+                                               VALUES (@Login, @Pass, @Email, @FirstName, @LastName, @Pesel, @BD, @Gen, @Phone, @City, @Postal, @Street, @HN, @AN, @IsArchived, GETDATE(), 0, 0)";
 
                             int nowyId;
+                            string hashedPass = HashujHaslo(uzytkownik.Haslo ?? "");
                             using (var cmdUser = new Microsoft.Data.SqlClient.SqlCommand(sqlUser, polaczenie, transakcja))
                             {
                                 cmdUser.Parameters.AddWithValue("@Login", uzytkownik.Login ?? "");
+                                cmdUser.Parameters.AddWithValue("@Pass", hashedPass);
+                                cmdUser.Parameters.AddWithValue("@Email", uzytkownik.Email ?? "");
                                 cmdUser.Parameters.AddWithValue("@FirstName", uzytkownik.Imiona ?? "");
                                 cmdUser.Parameters.AddWithValue("@LastName", uzytkownik.Nazwisko ?? "");
-                                cmdUser.Parameters.AddWithValue("@Email", uzytkownik.Email ?? "");
+                                cmdUser.Parameters.AddWithValue("@Pesel", uzytkownik.Pesel ?? "");
+                                cmdUser.Parameters.AddWithValue("@BD", uzytkownik.DataUrodzenia);
+                                cmdUser.Parameters.AddWithValue("@Gen", uzytkownik.CzyMezczyzna ? 1 : 0);
                                 cmdUser.Parameters.AddWithValue("@Phone", uzytkownik.Telefon ?? "");
+                                cmdUser.Parameters.AddWithValue("@City", uzytkownik.Miejscowosc ?? "");
+                                cmdUser.Parameters.AddWithValue("@Postal", uzytkownik.KodPocztowy ?? "");
+                                cmdUser.Parameters.AddWithValue("@Street", string.IsNullOrEmpty(uzytkownik.Ulica) ? DBNull.Value : (object)uzytkownik.Ulica);
+                                cmdUser.Parameters.AddWithValue("@HN", uzytkownik.NumerPosesji ?? "");
+                                cmdUser.Parameters.AddWithValue("@AN", string.IsNullOrEmpty(uzytkownik.NumerLokalu) ? DBNull.Value : (object)uzytkownik.NumerLokalu);
                                 cmdUser.Parameters.AddWithValue("@IsArchived", uzytkownik.CzyZarchiwizowany);
-                                cmdUser.Parameters.AddWithValue("@Pass", HashujHaslo(uzytkownik.Haslo ?? ""));
-                                cmdUser.Parameters.AddWithValue("@PersonID", nowePersonId);
+
                                 nowyId = (int)cmdUser.ExecuteScalar();
                             }
 
                             uzytkownik.Id = nowyId;
+
+                            // Zapisujemy hasło w historii
+                            string histSql = "INSERT INTO PasswordHistory (UserID, PasswordHash, ModifiedAt) VALUES (@UId, @PHash, GETDATE())";
+                            using (var histCmd = new Microsoft.Data.SqlClient.SqlCommand(histSql, polaczenie, transakcja))
+                            {
+                                histCmd.Parameters.AddWithValue("@UId", uzytkownik.Id);
+                                histCmd.Parameters.AddWithValue("@PHash", hashedPass);
+                                histCmd.ExecuteNonQuery();
+                            }
+
                             Uzytkownicy.Add(uzytkownik);
                         }
                         else // EDYCJA UŻYTKOWNIKA
                         {
-                            // Poprawka: Aktualizujemy hasło TYLKO wtedy, gdy wpisano nowe (żeby nie nadpisać go pustym stringiem przy edycji danych)
-                            string updUser = @"UPDATE Users SET FirstName=@FN, LastName=@LN, Email=@Em, Phone=@Ph, IsArchived=@Arc ";
+                            // Aktualizacja wszystkich danych leci prosto do Users
+                            string updUser = @"UPDATE Users SET FirstName=@FN, LastName=@LN, Email=@Em, Phone=@Ph, IsArchived=@Arc, PESEL=@Pesel, BirthDate=@BD, Gender=@Gen, City=@City, Street=@Street, PostalCode=@Postal, HouseNumber=@HN, ApartmentNumber=@AN ";
                             if (!string.IsNullOrEmpty(uzytkownik.Haslo))
                             {
                                 updUser += ", PasswordHash=@Pass, WymagaZmianyHasla=0 ";
@@ -208,33 +209,33 @@ namespace Przychodnia
                                 cmd.Parameters.AddWithValue("@Em", uzytkownik.Email);
                                 cmd.Parameters.AddWithValue("@Ph", uzytkownik.Telefon);
                                 cmd.Parameters.AddWithValue("@Arc", uzytkownik.CzyZarchiwizowany);
+                                cmd.Parameters.AddWithValue("@Pesel", uzytkownik.Pesel ?? "");
+                                cmd.Parameters.AddWithValue("@BD", uzytkownik.DataUrodzenia);
+                                cmd.Parameters.AddWithValue("@Gen", uzytkownik.CzyMezczyzna ? 1 : 0);
+                                cmd.Parameters.AddWithValue("@City", uzytkownik.Miejscowosc ?? "");
+                                cmd.Parameters.AddWithValue("@Postal", uzytkownik.KodPocztowy ?? "");
+                                cmd.Parameters.AddWithValue("@Street", string.IsNullOrEmpty(uzytkownik.Ulica) ? DBNull.Value : (object)uzytkownik.Ulica);
+                                cmd.Parameters.AddWithValue("@HN", uzytkownik.NumerPosesji ?? "");
+                                cmd.Parameters.AddWithValue("@AN", string.IsNullOrEmpty(uzytkownik.NumerLokalu) ? DBNull.Value : (object)uzytkownik.NumerLokalu);
 
                                 if (!string.IsNullOrEmpty(uzytkownik.Haslo))
                                 {
-                                    cmd.Parameters.AddWithValue("@Pass", HashujHaslo(uzytkownik.Haslo));
+                                    string hashedPass = HashujHaslo(uzytkownik.Haslo);
+                                    cmd.Parameters.AddWithValue("@Pass", hashedPass);
+                                    cmd.ExecuteNonQuery();
+
+                                    string histSql = "INSERT INTO PasswordHistory (UserID, PasswordHash, ModifiedAt) VALUES (@UId, @PHash, GETDATE())";
+                                    using (var histCmd = new Microsoft.Data.SqlClient.SqlCommand(histSql, polaczenie, transakcja))
+                                    {
+                                        histCmd.Parameters.AddWithValue("@UId", uzytkownik.Id);
+                                        histCmd.Parameters.AddWithValue("@PHash", hashedPass);
+                                        histCmd.ExecuteNonQuery();
+                                    }
                                 }
-
-                                cmd.ExecuteNonQuery();
-                            }
-
-                            string updPerson = @"UPDATE Persons SET FirstName=@FN, LastName=@LN, PESEL=@Pesel, BirthDate=@BD, Gender=@Gen, Phone=@Ph, 
-                                                 City=@City, Street=@Street, PostalCode=@Postal, HouseNumber=@HN, ApartmentNumber=@AN 
-                                                 WHERE PersonID = (SELECT PersonID FROM Users WHERE UserID = @Id)";
-                            using (var cmdP = new Microsoft.Data.SqlClient.SqlCommand(updPerson, polaczenie, transakcja))
-                            {
-                                cmdP.Parameters.AddWithValue("@Id", uzytkownik.Id);
-                                cmdP.Parameters.AddWithValue("@FN", uzytkownik.Imiona ?? "");
-                                cmdP.Parameters.AddWithValue("@LN", uzytkownik.Nazwisko ?? "");
-                                cmdP.Parameters.AddWithValue("@Pesel", uzytkownik.Pesel ?? "");
-                                cmdP.Parameters.AddWithValue("@BD", uzytkownik.DataUrodzenia);
-                                cmdP.Parameters.AddWithValue("@Gen", uzytkownik.CzyMezczyzna ? 1 : 0);
-                                cmdP.Parameters.AddWithValue("@Ph", uzytkownik.Telefon ?? "");
-                                cmdP.Parameters.AddWithValue("@City", uzytkownik.Miejscowosc ?? "");
-                                cmdP.Parameters.AddWithValue("@Street", uzytkownik.Ulica ?? "");
-                                cmdP.Parameters.AddWithValue("@Postal", uzytkownik.KodPocztowy ?? "");
-                                cmdP.Parameters.AddWithValue("@HN", uzytkownik.NumerPosesji ?? "");
-                                cmdP.Parameters.AddWithValue("@AN", uzytkownik.NumerLokalu ?? "");
-                                cmdP.ExecuteNonQuery();
+                                else
+                                {
+                                    cmd.ExecuteNonQuery();
+                                }
                             }
                         }
 
@@ -342,14 +343,18 @@ namespace Przychodnia
                                 if (blokada.HasValue && blokada.Value > DateTime.Now)
                                     return (false, "dany login został zablokowany", blokada.Value, false);
 
-                                if (dbHash == HashujHaslo(haslo))
+                                // Akceptujemy prawidłowy Hash ORAZ awaryjnie jawny tekst
+                                if (dbHash == HashujHaslo(haslo) || dbHash == haslo)
                                 {
                                     czytnik.Close();
-                                    string resetQuery = "UPDATE Users SET FailedLoginAttempts = 0, BlockedUntil = NULL WHERE UserID = @Id";
-                                    using (var cmdReset = new Microsoft.Data.SqlClient.SqlCommand(resetQuery, polaczenie))
+
+                                    // Auto-naprawa: Jeśli hasło było w bazie jawnym tekstem, od razu je szyfrujemy i podmieniamy na poprawne
+                                    string naprawQuery = "UPDATE Users SET PasswordHash = @Hash, FailedLoginAttempts = 0, BlockedUntil = NULL WHERE UserID = @Id";
+                                    using (var cmdNapraw = new Microsoft.Data.SqlClient.SqlCommand(naprawQuery, polaczenie))
                                     {
-                                        cmdReset.Parameters.AddWithValue("@Id", id);
-                                        cmdReset.ExecuteNonQuery();
+                                        cmdNapraw.Parameters.AddWithValue("@Hash", HashujHaslo(haslo));
+                                        cmdNapraw.Parameters.AddWithValue("@Id", id);
+                                        cmdNapraw.ExecuteNonQuery();
                                     }
 
                                     ZaladujBazeDanych();
@@ -395,48 +400,66 @@ namespace Przychodnia
 
         public static (bool Sukces, string Komunikat) ZresetujHaslo(string login, string email)
         {
-            // Walidacja formatu e-mail
-            if (string.IsNullOrWhiteSpace(email) || !System.Text.RegularExpressions.Regex.IsMatch(email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
-            {
-                return (false, "Podano niepoprawny format adresu e-mail.");
-            }
-
             try
             {
                 using (var polaczenie = new Microsoft.Data.SqlClient.SqlConnection(POLACZENIE_STRING))
                 {
                     polaczenie.Open();
-
+                    // 1. Sprawdzamy czy para Login + Email istnieje
                     string szukajSql = "SELECT UserID FROM Users WHERE Login = @Login AND Email = @Email AND IsArchived = 0";
                     int userId = 0;
                     using (var cmd = new Microsoft.Data.SqlClient.SqlCommand(szukajSql, polaczenie))
                     {
-                        cmd.Parameters.AddWithValue("@Login", login); 
+                        cmd.Parameters.AddWithValue("@Login", login);
                         cmd.Parameters.AddWithValue("@Email", email);
                         var wynik = cmd.ExecuteScalar();
                         if (wynik == null) return (false, "Nie znaleziono aktywnego konta z podanym loginem i adresem e-mail.");
                         userId = Convert.ToInt32(wynik);
                     }
 
+                    // 2. Generujemy hasło i hashujemy je
                     string noweHaslo = GenerujSilneHaslo();
+                    string hashedPass = HashujHaslo(noweHaslo);
 
-                    // Zapisujemy nowy Hash i oznaczamy flagę "WymagaZmianyHasla = 1"
-                    string updateSql = "UPDATE Users SET PasswordHash = @Hash, WymagaZmianyHasla = 1, FailedLoginAttempts = 0, BlockedUntil = NULL WHERE UserID = @Id";
+                    // 3. Update hasła w bazie i zapis do historii
+                    string updateSql = @"UPDATE Users SET PasswordHash = @Hash, WymagaZmianyHasla = 1, FailedLoginAttempts = 0, BlockedUntil = NULL WHERE UserID = @Id;
+                                         INSERT INTO PasswordHistory (UserID, PasswordHash, ModifiedAt) VALUES (@Id, @Hash, GETDATE());";
                     using (var cmd = new Microsoft.Data.SqlClient.SqlCommand(updateSql, polaczenie))
                     {
-                        cmd.Parameters.AddWithValue("@Hash", HashujHaslo(noweHaslo));
+                        cmd.Parameters.AddWithValue("@Hash", hashedPass);
                         cmd.Parameters.AddWithValue("@Id", userId);
                         cmd.ExecuteNonQuery();
                     }
 
-                    // Tutaj wysyłalibyśmy fizycznego e-maila protokołem SMTP. Do testów pokazujemy w oknie.
-                    return (true, $"Hasło zresetowane pomyślnie.\n\n[SYMULACJA WYSYŁKI E-MAIL]\nWiadomość wysłana na: {email}\nTwoje hasło jednorazowe to: {noweHaslo}");
+                    // 4. Fizyczna wysyłka
+                    WyslijEmailResetujacy(email, noweHaslo);
+
+                    return (true, "Hasło zostało zresetowane pomyślnie. Instrukcje zostały wysłane na Twój adres e-mail.");
                 }
             }
             catch (Exception ex)
             {
-                return (false, "Błąd systemu: " + ex.Message);
+                return (false, "Błąd systemu podczas resetowania: " + ex.Message);
             }
+        }
+
+        private static void WyslijEmailResetujacy(string doAdres, string tymczasoweHaslo)
+        {
+            // Konfiguracja SMTP
+            var smtp = new SmtpClient("sandbox.smtp.mailtrap.io")
+            {
+                Port = 2525,
+                Credentials = new NetworkCredential("1df70a2b8177fd", "61e02e2e72128c"),
+                EnableSsl = true,
+            };
+
+            var mail = new MailMessage();
+            mail.From = new MailAddress("system@przychodnia.pl", "System Przychodnia");
+            mail.To.Add(doAdres);
+            mail.Subject = "Resetowanie hasła - Przychodnia";
+            mail.Body = $"Witaj!\n\nTwoje hasło tymczasowe to: {tymczasoweHaslo}\n\nSystem wymusi jego zmianę przy pierwszym logowaniu.";
+
+            smtp.Send(mail);
         }
 
         public static bool CzyNadalWymagaZmiany(int userId)
@@ -489,5 +512,38 @@ namespace Przychodnia
 
             return gotoweHaslo;
         }
+
+        public static bool CzyHasloByloUzyteOstatnio(int userId, string noweHaslo)
+        {
+            string hashNowegoHasla = HashujHaslo(noweHaslo);
+            try
+            {
+                using (var polaczenie = new Microsoft.Data.SqlClient.SqlConnection(POLACZENIE_STRING))
+                {
+                    polaczenie.Open();
+                    string sql = "SELECT COUNT(1) FROM PasswordHistory WHERE UserID = @UserId AND PasswordHash = @Hash";
+                    using (var cmd = new Microsoft.Data.SqlClient.SqlCommand(sql, polaczenie))
+                    {
+                        cmd.Parameters.AddWithValue("@UserId", userId);
+                        cmd.Parameters.AddWithValue("@Hash", hashNowegoHasla);
+                        return Convert.ToInt32(cmd.ExecuteScalar()) > 0;
+                    }
+                }
+            }
+            catch { return false; }
+        }
+
+        public static bool CzyPeselZajety(string pesel, int idOmijanegoUzytkownika)
+        {
+            return Uzytkownicy.Any(u => u.Pesel == pesel && u.Id != idOmijanegoUzytkownika);
+        }
+
+        public static bool CzyEmailZajety(string email, int idOmijanegoUzytkownika)
+        {
+            if (string.IsNullOrWhiteSpace(email)) return false;
+
+            return Uzytkownicy.Any(u => u.Email != null && u.Email.ToLower() == email.ToLower() && u.Id != idOmijanegoUzytkownika);
+        }
+
     }
 }

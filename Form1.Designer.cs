@@ -37,6 +37,7 @@
             panel_informacyjny = new Panel();
             label_ogolny = new Label();
             panel_edycji = new Panel();
+            przycisk_dodaj_pacjenta = new Button();
             panel_boczny.SuspendLayout();
             panel_informacyjny.SuspendLayout();
             SuspendLayout();
@@ -44,6 +45,7 @@
             // panel_boczny
             // 
             panel_boczny.BackColor = SystemColors.ControlDark;
+            panel_boczny.Controls.Add(przycisk_dodaj_pacjenta);
             panel_boczny.Controls.Add(btn_zmien_haslo);
             panel_boczny.Controls.Add(btn_wyloguj);
             panel_boczny.Controls.Add(przycisk_przeglad_uprawnien);
@@ -143,6 +145,16 @@
             panel_edycji.Size = new Size(864, 581);
             panel_edycji.TabIndex = 2;
             // 
+            // przycisk_dodaj_pacjenta
+            // 
+            przycisk_dodaj_pacjenta.Location = new Point(0, 216);
+            przycisk_dodaj_pacjenta.Name = "przycisk_dodaj_pacjenta";
+            przycisk_dodaj_pacjenta.Size = new Size(200, 70);
+            przycisk_dodaj_pacjenta.TabIndex = 5;
+            przycisk_dodaj_pacjenta.Text = "Zarejestruj pacjenta";
+            przycisk_dodaj_pacjenta.UseVisualStyleBackColor = true;
+            przycisk_dodaj_pacjenta.Click += przycisk_dodaj_pacjenta_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -170,5 +182,6 @@
         private Button przycisk_przeglad_uprawnien;
         private Button btn_wyloguj;
         private Button btn_zmien_haslo;
+        private Button przycisk_dodaj_pacjenta;
     }
 }

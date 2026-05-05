@@ -25,14 +25,29 @@ namespace Przychodnia
             };
 
             checkbox_uwzglednienie_zarchwizowanych.Checked = true;
-            UstawDataGrid(BazaDanych.Uzytkownicy);
 
             Uzytkownik zalogowany = BazaDanych.ZALOGOWANY_UZYTKOWNIK;
-            if (zalogowany != null && zalogowany.SprawdzCzyMaRole("Administrator"))
+            bool czyAdmin = zalogowany != null && zalogowany.IdRol.Contains(1);
+            bool czyRecepcja = zalogowany != null && zalogowany.IdRol.Contains(3);
+
+            // Ukrywamy/Pokazujemy elementy na podstawie roli
+            if (czyAdmin)
             {
                 btn_archiwizuj.Visible = true;
                 btn_dodaj.Visible = true;
                 btn_edytuj.Visible = true;
+                UstawDataGrid(BazaDanych.Uzytkownicy);
+            }
+            else if (czyRecepcja)
+            {
+                btn_edytuj.Visible = true; // Recepcja tylko edytuje
+                btn_archiwizuj.Visible = false;
+                btn_dodaj.Visible = false;
+                checkedlistbox_filtr_roli.Visible = false; // Recepcja nie filtruje po rolach
+
+                // Recepcja widzi od razu TYLKO pacjentów
+                var tylkoPacjenci = new BindingList<Uzytkownik>(BazaDanych.Uzytkownicy.Where(u => u.IdRol.Contains(4)).ToList());
+                UstawDataGrid(tylkoPacjenci);
             }
         }
 
@@ -52,6 +67,8 @@ namespace Przychodnia
             okno.ShowDialog();
 
             UstawDataGrid(BazaDanych.Uzytkownicy);
+
+
         }
 
         private void UstawDataGrid(BindingList<Uzytkownik> lista)

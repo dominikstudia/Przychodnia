@@ -22,6 +22,14 @@ namespace Przychodnia
             {
                 checkedlistbox_uprawnienia.Items.Add(rola);
             }
+
+            bool czyAdmin = BazaDanych.ZALOGOWANY_UZYTKOWNIK != null && BazaDanych.ZALOGOWANY_UZYTKOWNIK.IdRol.Contains(1);
+            if (!czyAdmin)
+            {
+                // Jeśli to nie Admin (czyli np. Recepcja), chowamy listę uprawnień
+                checkedlistbox_uprawnienia.Visible = false;
+                label_uprawnienia.Visible = false;
+            }
         }
 
         public void WypelnijDane(Uzytkownik uzytkownik, bool czyTylkoOdczyt)
@@ -167,10 +175,10 @@ namespace Przychodnia
         private void btn_potwierdz_Click(object sender, EventArgs e)
         {
             var wymaganePolaTekstowe = new Dictionary<Control, Label>()
-            {
-                {textbox_login, label_login}, {textbox_email, label_adres_email}, {textbox_imiona, label_imiona}, {textbox_nazwisko, label_nazwisko}, { textbox_pesel, label_numer_pesel},
-                {combobox_plec, label_plec}, {textbox_numer_telefonu, label_numer_telefonu}, {textbox_miejscowosc, label_miejscowosc}, {textbox_ulica, label_ulica}, {textbox_kod_pocztowy, label_kod_pocztowy}
-            };
+    {
+        {textbox_login, label_login}, {textbox_email, label_adres_email}, {textbox_imiona, label_imiona}, {textbox_nazwisko, label_nazwisko}, { textbox_pesel, label_numer_pesel},
+        {combobox_plec, label_plec}, {textbox_numer_telefonu, label_numer_telefonu}, {textbox_miejscowosc, label_miejscowosc}, {textbox_ulica, label_ulica}, {textbox_kod_pocztowy, label_kod_pocztowy}
+    };
             foreach (var pole in wymaganePolaTekstowe)
             {
                 if ((pole.Key is TextBox t && string.IsNullOrWhiteSpace(t.Text)) || (pole.Key is MaskedTextBox m && !m.MaskFull) || (pole.Key is ComboBox c && c.SelectedIndex == -1))
@@ -190,17 +198,30 @@ namespace Przychodnia
             if (_uzytkownik == null || !string.IsNullOrEmpty(textbox_haslo.Text))
             {
                 string loginUzytkownika = textbox_login.Text.Trim();
+                string wpisaneHaslo = textbox_haslo.Text;
 
-                var walidacja = BazaDanych.SprawdzSileHasla(textbox_haslo.Text, loginUzytkownika);
+                // 1. Sprawdzamy siłę hasła
+                var walidacja = BazaDanych.SprawdzSileHasla(wpisaneHaslo, loginUzytkownika);
                 if (walidacja.CzySaBledy)
                 {
                     MessageBox.Show(walidacja.Komunikat, "Hasło zbyt słabe", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
+
+                // 2. Jeśli to jest EDYCJA, sprawdzamy historię 3 haseł
+                if (_uzytkownik != null && BazaDanych.CzyHasloByloUzyteOstatnio(_uzytkownik.Id, wpisaneHaslo))
+                {
+                    MessageBox.Show("Nie możesz ustawić hasła, którego ten użytkownik używał ostatnio (historia 3 haseł).",
+                                    "Błąd historii haseł", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
             }
 
+            // SPRAWDZENIE KTO UŻYWA PANELU
+            bool czyAdmin = BazaDanych.ZALOGOWANY_UZYTKOWNIK != null && BazaDanych.ZALOGOWANY_UZYTKOWNIK.IdRol.Contains(1);
 
-            if (checkedlistbox_uprawnienia.CheckedItems.Count == 0 && (_uzytkownik == null || !_uzytkownik.CzyZarchiwizowany))
+            // Wymagamy zaznaczenia roli TYLKO od Admina, Recepcji ten błąd nie wyskoczy.
+            if (czyAdmin && checkedlistbox_uprawnienia.CheckedItems.Count == 0 && (_uzytkownik == null || !_uzytkownik.CzyZarchiwizowany))
             {
                 MessageBox.Show("Użytkownik musi mieć co najmniej jedno uprawnienie!", "Błąd", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
@@ -228,7 +249,13 @@ namespace Przychodnia
             uzytkownik.Login = textbox_login.Text;
             uzytkownik.Imiona = textbox_imiona.Text;
             uzytkownik.Nazwisko = textbox_nazwisko.Text;
-            uzytkownik.Haslo = textbox_haslo.Text;
+
+            // Jeśli nie wpisano nowego hasła, nie nadpisujemy starego pustym stringiem
+            if (!string.IsNullOrEmpty(textbox_haslo.Text))
+            {
+                uzytkownik.Haslo = textbox_haslo.Text;
+            }
+
             uzytkownik.Email = textbox_email.Text;
             uzytkownik.Pesel = textbox_pesel.Text;
             uzytkownik.CzyMezczyzna = combobox_plec.Text == "Mężczyzna";
@@ -240,10 +267,14 @@ namespace Przychodnia
             uzytkownik.NumerPosesji = textbox_numer_posesji.Text;
             uzytkownik.NumerLokalu = textbox_numer_lokalu.Text;
 
-            uzytkownik.IdRol.Clear();
-            foreach (Rola r in checkedlistbox_uprawnienia.CheckedItems)
+            // Tylko Admin może zmieniać i czyścić uprawnienia
+            if (czyAdmin)
             {
-                uzytkownik.IdRol.Add(r.Id);
+                uzytkownik.IdRol.Clear();
+                foreach (Rola r in checkedlistbox_uprawnienia.CheckedItems)
+                {
+                    uzytkownik.IdRol.Add(r.Id);
+                }
             }
 
             if (BazaDanych.DodajLubZaaktualizujUzytkownika(uzytkownik))

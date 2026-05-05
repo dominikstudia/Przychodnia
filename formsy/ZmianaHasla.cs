@@ -48,6 +48,14 @@ namespace Przychodnia.formsy
 
             string aktualnyLogin = BazaDanych.ZALOGOWANY_UZYTKOWNIK?.Login ?? "";
 
+            // Sprawdzenie czy hasło nie powtarza się w historii 3 ostatnich
+            if (BazaDanych.CzyHasloByloUzyteOstatnio(BazaDanych.ZALOGOWANY_UZYTKOWNIK.Id, noweHaslo))
+            {
+                MessageBox.Show("Nowe hasło nie może być takie samo jak żadne z Twoich 3 ostatnich haseł!",
+                                "Błąd historii haseł", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
             var walidacja = BazaDanych.SprawdzSileHasla(noweHaslo, aktualnyLogin);
             if (walidacja.CzySaBledy)
             {

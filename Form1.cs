@@ -36,9 +36,10 @@ namespace Przychodnia
 
             przycisk_dodaj_uzytkownika.Visible = czyAdmin;
             przycisk_przeglad_uprawnien.Visible = czyAdmin;
-
+            przycisk_dodaj_pacjenta.Visible = czyRecepcjonista;
             przycisk_wyszukaj_uzytkownika.Visible = (czyAdmin || czyRecepcjonista);
 
+            przycisk_wyszukaj_uzytkownika.Text = czyAdmin ? "Lista użytkowników" : "Wyszukaj pacjenta";
         }
 
         private void przycisk_dodaj_uzytkownika_Click(object sender, EventArgs e)
@@ -87,6 +88,17 @@ namespace Przychodnia
             {
                 okno.ShowDialog();
             }
+        }
+
+        private void przycisk_dodaj_pacjenta_Click(object sender, EventArgs e)
+        {
+            panel_edycji.Controls.Clear();
+
+            DodajPacjentaPanel formularz = new DodajPacjentaPanel();
+            formularz.Dock = DockStyle.Fill;
+            panel_edycji.Controls.Add(formularz);
+
+            label_ogolny.Text = "Rejestracja nowego pacjenta";
         }
     }
 }
