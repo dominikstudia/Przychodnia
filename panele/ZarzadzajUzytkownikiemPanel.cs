@@ -11,7 +11,6 @@ namespace Przychodnia
 {
     public partial class ZarzadzajUzytkownikiemPanel : UserControl
     {
-
         private Uzytkownik _uzytkownik;
 
         public ZarzadzajUzytkownikiemPanel()
@@ -23,12 +22,23 @@ namespace Przychodnia
                 checkedlistbox_uprawnienia.Items.Add(rola);
             }
 
-            bool czyAdmin = BazaDanych.ZALOGOWANY_UZYTKOWNIK != null && BazaDanych.ZALOGOWANY_UZYTKOWNIK.IdRol.Contains(1);
+            Uzytkownik zalogowany = BazaDanych.ZALOGOWANY_UZYTKOWNIK;
+            bool czyAdmin = zalogowany != null && zalogowany.IdRol.Contains(1);
+            bool czyRecepcja = zalogowany != null && zalogowany.IdRol.Contains(3);
+
+            // 1. Logika uprawnień do widoku ról
             if (!czyAdmin)
             {
-                // Jeśli to nie Admin (czyli np. Recepcja), chowamy listę uprawnień
                 checkedlistbox_uprawnienia.Visible = false;
                 label_uprawnienia.Visible = false;
+            }
+
+            // 2. Blokada pól wrażliwych dla Recepcji (już na etapie tworzenia panelu)
+            if (czyRecepcja)
+            {
+                textbox_login.ReadOnly = true;
+                textbox_haslo.Enabled = false; // Recepcja nie może nawet kliknąć w hasło
+                btn_wygeneruj.Visible = false;
             }
         }
 
@@ -40,31 +50,40 @@ namespace Przychodnia
             textbox_email.Text = uzytkownik.Email;
             textbox_imiona.Text = uzytkownik.Imiona;
             textbox_nazwisko.Text = uzytkownik.Nazwisko;
-
             textbox_pesel.Text = uzytkownik.Pesel;
             combobox_plec.SelectedItem = (uzytkownik.CzyMezczyzna) ? "Mężczyzna" : "Kobieta";
             datetimerpicker_data_urodzenia.Value = uzytkownik.DataUrodzenia;
             textbox_numer_telefonu.Text = uzytkownik.Telefon;
-
             textbox_miejscowosc.Text = uzytkownik.Miejscowosc;
             textbox_ulica.Text = uzytkownik.Ulica;
             textbox_kod_pocztowy.Text = uzytkownik.KodPocztowy;
             textbox_numer_posesji.Text = uzytkownik.NumerPosesji;
             textbox_numer_lokalu.Text = uzytkownik.NumerLokalu;
+
             for (int i = 0; i < checkedlistbox_uprawnienia.Items.Count; i++)
             {
                 var rola = (Rola)checkedlistbox_uprawnienia.Items[i];
                 checkedlistbox_uprawnienia.SetItemChecked(i, uzytkownik.IdRol.Contains(rola.Id));
             }
 
-            if (czyTylkoOdczyt) checkedlistbox_uprawnienia.Enabled = false;
-
+            // Obsługa trybu "Tylko do odczytu" (podgląd)
             if (czyTylkoOdczyt)
             {
                 ZablokujWszystkiePola(this.Controls);
                 btn_wygeneruj.Visible = false;
                 btn_anuluj.Text = "Powrót";
                 btn_potwierdz.Visible = false;
+            }
+            else
+            {
+                // Jeśli to EDYCJA, a zalogowana jest Recepcja, upewniamy się, że login i hasło są zablokowane
+                bool czyRecepcja = BazaDanych.ZALOGOWANY_UZYTKOWNIK != null && BazaDanych.ZALOGOWANY_UZYTKOWNIK.IdRol.Contains(3);
+                if (czyRecepcja)
+                {
+                    textbox_login.ReadOnly = true;
+                    textbox_haslo.Enabled = false;
+                    btn_wygeneruj.Visible = false;
+                }
             }
         }
 
@@ -76,112 +95,31 @@ namespace Przychodnia
                 if (c is ComboBox cb) cb.Enabled = false;
                 if (c is MaskedTextBox m) m.Enabled = false;
                 if (c is DateTimePicker dtp) dtp.Enabled = false;
+                if (c is CheckedListBox clb) clb.Enabled = false;
                 if (c.HasChildren) ZablokujWszystkiePola(c.Controls);
             }
         }
 
-        private Boolean SprawdzPesel(String pesel, Boolean czyMezczyzna, DateTime data)
-        {
-            if (pesel == null || !Regex.IsMatch(pesel, @"^\d{11}$")) return false;
-
-            int rok = data.Year;
-            int sformatowanyMiesiac = data.Month;
-
-            if (rok < 1900 || rok > 2100) return false;
-            if (rok >= 2000) sformatowanyMiesiac += 20;
-
-            string oczekiwanyPoczatek = $"{rok % 100:D2}{sformatowanyMiesiac:D2}{data.Day:D2}";
-            if (!pesel.StartsWith(oczekiwanyPoczatek)) return false;
-
-            bool czyPeselWskazujeMezczyzne = int.Parse(pesel[9].ToString()) % 2 != 0;
-            if (czyPeselWskazujeMezczyzne != czyMezczyzna) return false;
-
-            int[] wagi = { 1, 3, 7, 9, 1, 3, 7, 9, 1, 3 };
-            int suma = 0;
-
-            for (int i = 0; i < 10; i++)
-            {
-                suma += int.Parse(pesel[i].ToString()) * wagi[i];
-            }
-            int cyfraKontrolna = (10 - (suma % 10)) % 10;
-
-            return cyfraKontrolna == int.Parse(pesel[10].ToString());
-        }
-
-        ///
-
-        private void textbox_pesel_Click(object sender, EventArgs e)
-        {
-            textbox_pesel.SelectionStart = 0;
-        }
-
-        private void textbox_numer_telefonu_Click(object sender, EventArgs e)
-        {
-            textbox_numer_telefonu.SelectionStart = 0;
-        }
-
-        private void textbox_kod_pocztowy_Click(object sender, EventArgs e)
-        {
-            textbox_kod_pocztowy.SelectionStart = 0;
-        }
-
-        private void textbox_login_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            RegexPatterny.SprawdzCzyMoznaKliknacPrzycisk(RegexPatterny.MALE_LITERY_I_PODLOGA, e);
-        }
-
-        private void textbox_email_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            RegexPatterny.SprawdzCzyMoznaKliknacPrzycisk(RegexPatterny.LITERY_LICZBY_PODLOGA_KROPKA_MYSLNIK_PODLOGA, e);
-        }
-
-        private void textbox_imiona_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            RegexPatterny.SprawdzCzyMoznaKliknacPrzycisk(RegexPatterny.POLSKIE_LITERY_SPACJA, e);
-        }
-
-        private void textbox_nazwisko_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            RegexPatterny.SprawdzCzyMoznaKliknacPrzycisk(RegexPatterny.POLSKIE_LITERY_MYSLNIK, e);
-        }
-
-        private void textbox_miejscowosc_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            RegexPatterny.SprawdzCzyMoznaKliknacPrzycisk(RegexPatterny.POLSKIE_LITERY_SPACJA_MYSLNIK, e);
-        }
-
-        private void textbox_ulica_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            RegexPatterny.SprawdzCzyMoznaKliknacPrzycisk(RegexPatterny.POLSKIE_LITERY_SPACJA_MYSLNIK, e);
-        }
-
-        private void textbox_numer_posesji_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            RegexPatterny.SprawdzCzyMoznaKliknacPrzycisk(RegexPatterny.LICZBY_LITERY_UKOSNIK, e);
-        }
-
-        private void textbox_numer_lokalu_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            RegexPatterny.SprawdzCzyMoznaKliknacPrzycisk(RegexPatterny.LICZBY_LITERY_UKOSNIK, e);
-        }
-
-        private void btn_anuluj_Click(object sender, EventArgs e)
-        {
-            Form okno = this.FindForm();
-            if (okno != null && okno is not Form1) okno.Close();
-            else this.Parent?.Controls.Remove(this);
-        }
-
         private void btn_potwierdz_Click(object sender, EventArgs e)
         {
+            Uzytkownik zalogowany = BazaDanych.ZALOGOWANY_UZYTKOWNIK;
+            bool czyAdmin = zalogowany != null && zalogowany.IdRol.Contains(1);
+            bool czyRecepcja = zalogowany != null && zalogowany.IdRol.Contains(3);
+
+            // Walidacja pól wymaganych
             var wymaganePolaTekstowe = new Dictionary<Control, Label>()
-    {
-        {textbox_login, label_login}, {textbox_email, label_adres_email}, {textbox_imiona, label_imiona}, {textbox_nazwisko, label_nazwisko}, { textbox_pesel, label_numer_pesel},
-        {combobox_plec, label_plec}, {textbox_numer_telefonu, label_numer_telefonu}, {textbox_miejscowosc, label_miejscowosc}, {textbox_ulica, label_ulica}, {textbox_kod_pocztowy, label_kod_pocztowy}
-    };
+            {
+                {textbox_login, label_login}, {textbox_email, label_adres_email}, {textbox_imiona, label_imiona},
+                {textbox_nazwisko, label_nazwisko}, {textbox_pesel, label_numer_pesel}, {combobox_plec, label_plec},
+                {textbox_numer_telefonu, label_numer_telefonu}, {textbox_miejscowosc, label_miejscowosc},
+                {textbox_ulica, label_ulica}, {textbox_kod_pocztowy, label_kod_pocztowy}
+            };
+
             foreach (var pole in wymaganePolaTekstowe)
             {
-                if ((pole.Key is TextBox t && string.IsNullOrWhiteSpace(t.Text)) || (pole.Key is MaskedTextBox m && !m.MaskFull) || (pole.Key is ComboBox c && c.SelectedIndex == -1))
+                if ((pole.Key is TextBox t && string.IsNullOrWhiteSpace(t.Text)) ||
+                    (pole.Key is MaskedTextBox m && !m.MaskFull) ||
+                    (pole.Key is ComboBox c && c.SelectedIndex == -1))
                 {
                     MessageBox.Show($"Pole '{pole.Value.Text}' jest wymagane!", "Błąd", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     pole.Key.Focus();
@@ -189,18 +127,19 @@ namespace Przychodnia
                 }
             }
 
+            // Walidacja email
             if (!Regex.IsMatch(textbox_email.Text, RegexPatterny.WALIDATOR_EMAIL))
             {
                 MessageBox.Show("Wprowadziłeś niepoprawny format emaila");
                 return;
             }
 
-            if (_uzytkownik == null || !string.IsNullOrEmpty(textbox_haslo.Text))
+            // Walidacja hasła (tylko jeśli pole jest aktywne i coś wpisano)
+            if (textbox_haslo.Enabled && !string.IsNullOrEmpty(textbox_haslo.Text))
             {
                 string loginUzytkownika = textbox_login.Text.Trim();
                 string wpisaneHaslo = textbox_haslo.Text;
 
-                // 1. Sprawdzamy siłę hasła
                 var walidacja = BazaDanych.SprawdzSileHasla(wpisaneHaslo, loginUzytkownika);
                 if (walidacja.CzySaBledy)
                 {
@@ -208,25 +147,14 @@ namespace Przychodnia
                     return;
                 }
 
-                // 2. Jeśli to jest EDYCJA, sprawdzamy historię 3 haseł
                 if (_uzytkownik != null && BazaDanych.CzyHasloByloUzyteOstatnio(_uzytkownik.Id, wpisaneHaslo))
                 {
-                    MessageBox.Show("Nie możesz ustawić hasła, którego ten użytkownik używał ostatnio (historia 3 haseł).",
-                                    "Błąd historii haseł", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show("Nie możesz ustawić hasła, którego ten użytkownik używał ostatnio (historia 3 haseł).", "Błąd historii haseł", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
             }
 
-            // SPRAWDZENIE KTO UŻYWA PANELU
-            bool czyAdmin = BazaDanych.ZALOGOWANY_UZYTKOWNIK != null && BazaDanych.ZALOGOWANY_UZYTKOWNIK.IdRol.Contains(1);
-
-            // Wymagamy zaznaczenia roli TYLKO od Admina, Recepcji ten błąd nie wyskoczy.
-            if (czyAdmin && checkedlistbox_uprawnienia.CheckedItems.Count == 0 && (_uzytkownik == null || !_uzytkownik.CzyZarchiwizowany))
-            {
-                MessageBox.Show("Użytkownik musi mieć co najmniej jedno uprawnienie!", "Błąd", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
+            // Sprawdzenie PESEL
             DateTime data = datetimerpicker_data_urodzenia.Value;
             if (!SprawdzPesel(textbox_pesel.Text, combobox_plec.SelectedItem.ToString() == "Mężczyzna", data))
             {
@@ -234,28 +162,21 @@ namespace Przychodnia
                 return;
             }
 
-            Uzytkownik uzytkownik;
+            // Mapowanie danych na obiekt
+            Uzytkownik uzytkownik = _uzytkownik ?? new Uzytkownik { Id = -1 };
 
-            if (_uzytkownik != null)
+            // Ochrona danych dla recepcji: jeśli to edycja i robi to recepcja, nie zmieniamy loginu
+            if (czyRecepcja && _uzytkownik != null)
             {
-                uzytkownik = _uzytkownik;
+                uzytkownik.Login = _uzytkownik.Login; // Przywracamy oryginał na wszelki wypadek
             }
             else
             {
-                uzytkownik = new Uzytkownik();
-                uzytkownik.Id = -1;
+                uzytkownik.Login = textbox_login.Text;
             }
 
-            uzytkownik.Login = textbox_login.Text;
             uzytkownik.Imiona = textbox_imiona.Text;
             uzytkownik.Nazwisko = textbox_nazwisko.Text;
-
-            // Jeśli nie wpisano nowego hasła, nie nadpisujemy starego pustym stringiem
-            if (!string.IsNullOrEmpty(textbox_haslo.Text))
-            {
-                uzytkownik.Haslo = textbox_haslo.Text;
-            }
-
             uzytkownik.Email = textbox_email.Text;
             uzytkownik.Pesel = textbox_pesel.Text;
             uzytkownik.CzyMezczyzna = combobox_plec.Text == "Mężczyzna";
@@ -267,7 +188,13 @@ namespace Przychodnia
             uzytkownik.NumerPosesji = textbox_numer_posesji.Text;
             uzytkownik.NumerLokalu = textbox_numer_lokalu.Text;
 
-            // Tylko Admin może zmieniać i czyścić uprawnienia
+            // Hasło zmieniamy tylko jeśli pole było aktywne i coś wpisano
+            if (textbox_haslo.Enabled && !string.IsNullOrEmpty(textbox_haslo.Text))
+            {
+                uzytkownik.Haslo = textbox_haslo.Text;
+            }
+
+            // Tylko Admin zarządza rolami
             if (czyAdmin)
             {
                 uzytkownik.IdRol.Clear();
@@ -275,30 +202,64 @@ namespace Przychodnia
                 {
                     uzytkownik.IdRol.Add(r.Id);
                 }
+
+                if (uzytkownik.IdRol.Count == 0 && !uzytkownik.CzyZarchiwizowany)
+                {
+                    MessageBox.Show("Użytkownik musi mieć co najmniej jedno uprawnienie!", "Błąd", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
             }
 
             if (BazaDanych.DodajLubZaaktualizujUzytkownika(uzytkownik))
             {
-                if (_uzytkownik == null)
-                {
-                    MessageBox.Show("Pomyślnie dodano użytkownika");
-                }
-                else
-                {
-                    MessageBox.Show("Pomyślnie zaaktualizowano użytkownika");
-                }
+                MessageBox.Show(_uzytkownik == null ? "Pomyślnie dodano użytkownika" : "Pomyślnie zaaktualizowano użytkownika");
+                btn_anuluj_Click(null, null);
             }
-            btn_anuluj_Click(null, null);
         }
 
         private void btn_wygeneruj_Click(object sender, EventArgs e)
         {
-            // Korzystamy z naszej nowej, scentralizowanej metody
             string noweHaslo = BazaDanych.GenerujSilneHaslo();
-
             textbox_haslo.Text = noweHaslo;
-
-            MessageBox.Show("Wygenerowano nowe, bezpieczne hasło i skopiowano je do schowka.", "Sukces", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show("Wygenerowano nowe, bezpieczne hasło.", "Sukces", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
+
+        private void btn_anuluj_Click(object sender, EventArgs e)
+        {
+            Form okno = this.FindForm();
+            if (okno != null && okno.Name != "Form1") okno.Close();
+            else this.Parent?.Controls.Remove(this);
+        }
+
+        // --- Walidacja PESEL i zdarzenia KeyPress (pozostały bez zmian jak w oryginale) ---
+        private Boolean SprawdzPesel(String pesel, Boolean czyMezczyzna, DateTime data)
+        {
+            if (pesel == null || !Regex.IsMatch(pesel, @"^\d{11}$")) return false;
+            int rok = data.Year;
+            int sformatowanyMiesiac = data.Month;
+            if (rok < 1900 || rok > 2100) return false;
+            if (rok >= 2000) sformatowanyMiesiac += 20;
+            string oczekiwanyPoczatek = $"{rok % 100:D2}{sformatowanyMiesiac:D2}{data.Day:D2}";
+            if (!pesel.StartsWith(oczekiwanyPoczatek)) return false;
+            bool czyPeselWskazujeMezczyzne = int.Parse(pesel[9].ToString()) % 2 != 0;
+            if (czyPeselWskazujeMezczyzne != czyMezczyzna) return false;
+            int[] wagi = { 1, 3, 7, 9, 1, 3, 7, 9, 1, 3 };
+            int suma = 0;
+            for (int i = 0; i < 10; i++) suma += int.Parse(pesel[i].ToString()) * wagi[i];
+            int cyfraKontrolna = (10 - (suma % 10)) % 10;
+            return cyfraKontrolna == int.Parse(pesel[10].ToString());
+        }
+
+        private void textbox_pesel_Click(object sender, EventArgs e) => textbox_pesel.SelectionStart = 0;
+        private void textbox_numer_telefonu_Click(object sender, EventArgs e) => textbox_numer_telefonu.SelectionStart = 0;
+        private void textbox_kod_pocztowy_Click(object sender, EventArgs e) => textbox_kod_pocztowy.SelectionStart = 0;
+        private void textbox_login_KeyPress(object sender, KeyPressEventArgs e) => RegexPatterny.SprawdzCzyMoznaKliknacPrzycisk(RegexPatterny.MALE_LITERY_I_PODLOGA, e);
+        private void textbox_email_KeyPress(object sender, KeyPressEventArgs e) => RegexPatterny.SprawdzCzyMoznaKliknacPrzycisk(RegexPatterny.LITERY_LICZBY_PODLOGA_KROPKA_MYSLNIK_PODLOGA, e);
+        private void textbox_imiona_KeyPress(object sender, KeyPressEventArgs e) => RegexPatterny.SprawdzCzyMoznaKliknacPrzycisk(RegexPatterny.POLSKIE_LITERY_SPACJA, e);
+        private void textbox_nazwisko_KeyPress(object sender, KeyPressEventArgs e) => RegexPatterny.SprawdzCzyMoznaKliknacPrzycisk(RegexPatterny.POLSKIE_LITERY_MYSLNIK, e);
+        private void textbox_miejscowosc_KeyPress(object sender, KeyPressEventArgs e) => RegexPatterny.SprawdzCzyMoznaKliknacPrzycisk(RegexPatterny.POLSKIE_LITERY_SPACJA_MYSLNIK, e);
+        private void textbox_ulica_KeyPress(object sender, KeyPressEventArgs e) => RegexPatterny.SprawdzCzyMoznaKliknacPrzycisk(RegexPatterny.POLSKIE_LITERY_SPACJA_MYSLNIK, e);
+        private void textbox_numer_posesji_KeyPress(object sender, KeyPressEventArgs e) => RegexPatterny.SprawdzCzyMoznaKliknacPrzycisk(RegexPatterny.LICZBY_LITERY_UKOSNIK, e);
+        private void textbox_numer_lokalu_KeyPress(object sender, KeyPressEventArgs e) => RegexPatterny.SprawdzCzyMoznaKliknacPrzycisk(RegexPatterny.LICZBY_LITERY_UKOSNIK, e);
     }
 }

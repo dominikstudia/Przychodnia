@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Linq; // Dodane dla obsługi Where i Any
 using System.Text;
 using System.Windows.Forms;
 
@@ -14,41 +15,109 @@ namespace Przychodnia
         {
             InitializeComponent();
 
+            // Przypisujemy zdarzenie Load
+            this.Load += ListaUzytkownikowPanel_Load;
+
+            // Zdarzenie zmiany checkboxa - z zabezpieczeniem IsHandleCreated
+            checkedlistbox_filtr_roli.ItemCheck += (s, e) =>
+            {
+                if (this.IsHandleCreated)
+                {
+                    this.BeginInvoke((MethodInvoker)(() => btn_szukaj_Click(null, null)));
+                }
+            };
+        }
+
+        private void ListaUzytkownikowPanel_Load(object sender, EventArgs e)
+        {
+            // 1. Pobieramy role do listy
+            checkedlistbox_filtr_roli.Items.Clear();
             foreach (var rola in BazaDanych.PobierzWszystkieRole())
             {
                 checkedlistbox_filtr_roli.Items.Add(rola);
             }
 
-            checkedlistbox_filtr_roli.ItemCheck += (s, e) =>
-            {
-                this.BeginInvoke((MethodInvoker)(() => btn_szukaj_Click(null, null)));
-            };
-
-            checkbox_uwzglednienie_zarchwizowanych.Checked = true;
-
+            // 2. Sprawdzamy uprawnienia zalogowanego użytkownika
             Uzytkownik zalogowany = BazaDanych.ZALOGOWANY_UZYTKOWNIK;
             bool czyAdmin = zalogowany != null && zalogowany.IdRol.Contains(1);
             bool czyRecepcja = zalogowany != null && zalogowany.IdRol.Contains(3);
 
-            // Ukrywamy/Pokazujemy elementy na podstawie roli
+            checkbox_uwzglednienie_zarchwizowanych.Checked = true;
+
+            // 3. Konfiguracja interfejsu na podstawie roli
             if (czyAdmin)
             {
                 btn_archiwizuj.Visible = true;
                 btn_dodaj.Visible = true;
                 btn_edytuj.Visible = true;
-                UstawDataGrid(BazaDanych.Uzytkownicy);
+                checkedlistbox_filtr_roli.Visible = true;
             }
             else if (czyRecepcja)
             {
-                btn_edytuj.Visible = true; // Recepcja tylko edytuje
+                btn_edytuj.Visible = true;
                 btn_archiwizuj.Visible = false;
                 btn_dodaj.Visible = false;
-                checkedlistbox_filtr_roli.Visible = false; // Recepcja nie filtruje po rolach
 
-                // Recepcja widzi od razu TYLKO pacjentów
-                var tylkoPacjenci = new BindingList<Uzytkownik>(BazaDanych.Uzytkownicy.Where(u => u.IdRol.Contains(4)).ToList());
-                UstawDataGrid(tylkoPacjenci);
+                // Ukrywamy listę, ale zaznaczamy w niej Pacjentów (ID 4)
+                checkedlistbox_filtr_roli.Visible = false;
+
+                for (int i = 0; i < checkedlistbox_filtr_roli.Items.Count; i++)
+                {
+                    var rola = checkedlistbox_filtr_roli.Items[i] as Rola;
+                    if (rola != null && rola.Id == 4)
+                    {
+                        checkedlistbox_filtr_roli.SetItemChecked(i, true);
+                    }
+                }
             }
+
+            // 4. Pierwsze ładowanie danych
+            btn_szukaj_Click(null, null);
+        }
+
+        private void UstawDataGrid(BindingList<Uzytkownik> lista)
+        {
+            datagrid_uzytkownicy.DataSource = lista;
+
+            // Ukrywanie zbędnych kolumn
+            string[] doUkrycia = { "Haslo", "NumerPosesji", "NumerLokalu", "KodPocztowy", "CzyMezczyzna" };
+            foreach (var col in doUkrycia)
+            {
+                if (datagrid_uzytkownicy.Columns[col] != null)
+                    datagrid_uzytkownicy.Columns[col].Visible = false;
+            }
+
+            if (datagrid_uzytkownicy.Columns["Plec"] != null)
+            {
+                datagrid_uzytkownicy.Columns["Plec"].HeaderText = "Płeć";
+                datagrid_uzytkownicy.Columns["Plec"].DisplayIndex = 7;
+            }
+
+            if (datagrid_uzytkownicy.Columns["CzyZarchiwizowany"] != null)
+                datagrid_uzytkownicy.Columns["CzyZarchiwizowany"].HeaderText = "Zarchiwizowany";
+
+            if (datagrid_uzytkownicy.Columns["DataUrodzenia"] != null)
+                datagrid_uzytkownicy.Columns["DataUrodzenia"].HeaderText = "Data urodzenia";
+        }
+
+        private void btn_szukaj_Click(object sender, EventArgs e)
+        {
+            string szukanaFraza = textbox_wyszukiwanie.Text.ToLower().Trim();
+            bool czyPokazacZarchiwizowanych = checkbox_uwzglednienie_zarchwizowanych.Checked;
+
+            List<int> wybraneRoleIds = new List<int>();
+            foreach (Rola r in checkedlistbox_filtr_roli.CheckedItems)
+            {
+                wybraneRoleIds.Add(r.Id);
+            }
+
+            var przefiltrowani = BazaDanych.Uzytkownicy.Where(u =>
+                (czyPokazacZarchiwizowanych || !u.CzyZarchiwizowany) &&
+                (string.IsNullOrEmpty(szukanaFraza) || u.PobierzWszystkieDane().Contains(szukanaFraza)) &&
+                (wybraneRoleIds.Count == 0 || u.IdRol.Any(id => wybraneRoleIds.Contains(id)))
+            ).ToList();
+
+            UstawDataGrid(new BindingList<Uzytkownik>(przefiltrowani));
         }
 
         private void StworzOknoFormularza(string naglowek, Uzytkownik? uzytkownik, bool czyTylkoOdczyt)
@@ -66,72 +135,32 @@ namespace Przychodnia
             okno.Controls.Add(panel);
             okno.ShowDialog();
 
-            UstawDataGrid(BazaDanych.Uzytkownicy);
-
-
+            // Odśwież po zamknięciu okna
+            btn_szukaj_Click(null, null);
         }
 
-        private void UstawDataGrid(BindingList<Uzytkownik> lista)
-        {
-            datagrid_uzytkownicy.DataSource = lista;
-
-            if (datagrid_uzytkownicy.Columns["Haslo"] != null) datagrid_uzytkownicy.Columns["Haslo"].Visible = false;
-            if (datagrid_uzytkownicy.Columns["NumerPosesji"] != null) datagrid_uzytkownicy.Columns["NumerPosesji"].Visible = false;
-            if (datagrid_uzytkownicy.Columns["NumerLokalu"] != null) datagrid_uzytkownicy.Columns["NumerLokalu"].Visible = false;
-            if (datagrid_uzytkownicy.Columns["KodPocztowy"] != null) datagrid_uzytkownicy.Columns["KodPocztowy"].Visible = false;
-            if (datagrid_uzytkownicy.Columns["CzyMezczyzna"] != null) datagrid_uzytkownicy.Columns["CzyMezczyzna"].Visible = false;
-
-
-            if (datagrid_uzytkownicy.Columns["Plec"] != null)
-            {
-                datagrid_uzytkownicy.Columns["Plec"].HeaderText = "Płeć";
-                datagrid_uzytkownicy.Columns["Plec"].DisplayIndex = 7;
-            }
-
-            if (datagrid_uzytkownicy.Columns["CzyZarchiwizowany"] != null)
-                datagrid_uzytkownicy.Columns["CzyZarchiwizowany"].HeaderText = "Zarchiwizowany";
-
-            if (datagrid_uzytkownicy.Columns["DataUrodzenia"] != null)
-                datagrid_uzytkownicy.Columns["DataUrodzenia"].HeaderText = "Data urodzenia";
-        }
-
-        ///
-
-        private void btn_dodaj_Click(object sender, EventArgs e)
-        {
+        private void btn_dodaj_Click(object sender, EventArgs e) =>
             StworzOknoFormularza("Dodawanie nowego uzytkownika", null, false);
-        }
 
-        private void btn_szukaj_Click(object sender, EventArgs e)
+        private void btn_edytuj_Click(object sender, EventArgs e)
         {
-            string szukanaFraza = textbox_wyszukiwanie.Text.ToLower().Trim();
-            bool czyPokazacZarchiwizowanych = checkbox_uwzglednienie_zarchwizowanych.Checked;
+            if (datagrid_uzytkownicy.SelectedRows.Count == 0) return;
+            if (datagrid_uzytkownicy.SelectedRows[0].DataBoundItem is not Uzytkownik wybrany) return;
 
-            List<int> wybraneRoleIds = new List<int>();
-            foreach (Rola r in checkedlistbox_filtr_roli.CheckedItems)
+            if (wybrany.CzyZarchiwizowany)
             {
-                wybraneRoleIds.Add(r.Id);
+                MessageBox.Show("Ten uzytkownik jest zaarchiwizowany, wiec nie mozna edytowac jego danych");
+                return;
             }
 
-            var przefiltrowani = BazaDanych.Uzytkownicy.Where(u =>
-                (czyPokazacZarchiwizowanych || !u.CzyZarchiwizowany) &&
-                (string.IsNullOrEmpty(szukanaFraza) || u.PobierzWszystkieDane().Contains(szukanaFraza)) &&
-
-                (wybraneRoleIds.Count == 0 || u.IdRol.Any(id => wybraneRoleIds.Contains(id)))
-            ).ToList();
-
-            UstawDataGrid(new BindingList<Uzytkownik>(przefiltrowani));
-
-            if (przefiltrowani.Count == 0 && wybraneRoleIds.Count > 0)
-            {
-                MessageBox.Show("Brak użytkowników spełniających wybrane kryteria.", "Informacja", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
+            StworzOknoFormularza("Edycja uzytkownika", wybrany, false);
         }
 
         private void btn_archiwizuj_Click(object sender, EventArgs e)
         {
             if (datagrid_uzytkownicy.SelectedRows.Count == 0) return;
             if (datagrid_uzytkownicy.SelectedRows[0].DataBoundItem is not Uzytkownik wybrany) return;
+
             if (wybrany.CzyZarchiwizowany)
             {
                 MessageBox.Show("Ten uzytkownik jest juz zaarchiwizowany");
@@ -147,19 +176,6 @@ namespace Przychodnia
             }
         }
 
-        private void btn_edytuj_Click(object sender, EventArgs e)
-        {
-            if (datagrid_uzytkownicy.SelectedRows.Count == 0) return;
-            if (datagrid_uzytkownicy.SelectedRows[0].DataBoundItem is not Uzytkownik wybrany) return;
-            if (wybrany.CzyZarchiwizowany)
-            {
-                MessageBox.Show("Ten uzytkownik jest zaarchiwizowany, wiec nie mozna edytowac jego danych");
-                return;
-            }
-
-            StworzOknoFormularza("Edycja uzytkownika", wybrany, false);
-        }
-
         private void btn_podglad_szczegolow_Click(object sender, EventArgs e)
         {
             if (datagrid_uzytkownicy.SelectedRows.Count == 0) return;
@@ -167,6 +183,5 @@ namespace Przychodnia
 
             StworzOknoFormularza("Szczegóły", wybrany, true);
         }
-
     }
 }

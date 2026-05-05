@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             panel_boczny = new Panel();
+            przycisk_dodaj_pacjenta = new Button();
             btn_zmien_haslo = new Button();
             btn_wyloguj = new Button();
             przycisk_przeglad_uprawnien = new Button();
@@ -37,7 +38,6 @@
             panel_informacyjny = new Panel();
             label_ogolny = new Label();
             panel_edycji = new Panel();
-            przycisk_dodaj_pacjenta = new Button();
             panel_boczny.SuspendLayout();
             panel_informacyjny.SuspendLayout();
             SuspendLayout();
@@ -56,6 +56,16 @@
             panel_boczny.Name = "panel_boczny";
             panel_boczny.Size = new Size(200, 581);
             panel_boczny.TabIndex = 0;
+            // 
+            // przycisk_dodaj_pacjenta
+            // 
+            przycisk_dodaj_pacjenta.Location = new Point(0, 70);
+            przycisk_dodaj_pacjenta.Name = "przycisk_dodaj_pacjenta";
+            przycisk_dodaj_pacjenta.Size = new Size(200, 70);
+            przycisk_dodaj_pacjenta.TabIndex = 5;
+            przycisk_dodaj_pacjenta.Text = "Zarejestruj pacjenta";
+            przycisk_dodaj_pacjenta.UseVisualStyleBackColor = true;
+            przycisk_dodaj_pacjenta.Click += przycisk_dodaj_pacjenta_Click;
             // 
             // btn_zmien_haslo
             // 
@@ -144,16 +154,6 @@
             panel_edycji.Name = "panel_edycji";
             panel_edycji.Size = new Size(864, 581);
             panel_edycji.TabIndex = 2;
-            // 
-            // przycisk_dodaj_pacjenta
-            // 
-            przycisk_dodaj_pacjenta.Location = new Point(0, 216);
-            przycisk_dodaj_pacjenta.Name = "przycisk_dodaj_pacjenta";
-            przycisk_dodaj_pacjenta.Size = new Size(200, 70);
-            przycisk_dodaj_pacjenta.TabIndex = 5;
-            przycisk_dodaj_pacjenta.Text = "Zarejestruj pacjenta";
-            przycisk_dodaj_pacjenta.UseVisualStyleBackColor = true;
-            przycisk_dodaj_pacjenta.Click += przycisk_dodaj_pacjenta_Click;
             // 
             // Form1
             // 
