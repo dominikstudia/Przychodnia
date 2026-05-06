@@ -111,13 +111,39 @@ namespace Przychodnia
                 wybraneRoleIds.Add(r.Id);
             }
 
+            // 1. Sprawdzamy, kto jest zalogowany
+            Uzytkownik zalogowany = BazaDanych.ZALOGOWANY_UZYTKOWNIK;
+            bool czyAdmin = zalogowany != null && zalogowany.IdRol.Contains(1);
+            bool czyRecepcja = zalogowany != null && zalogowany.IdRol.Contains(3) && !czyAdmin;
+
+            // 2. Rozbijamy szukaną frazę na słowa (żeby zadziałało np. "Adam Nowak" albo "Łódź Piotrkowska")
+            var slowaKluczowe = szukanaFraza.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+            // 3. Wyszukiwanie podstawowe (każde wpisane słowo musi być w danych użytkownika)
             var przefiltrowani = BazaDanych.Uzytkownicy.Where(u =>
                 (czyPokazacZarchiwizowanych || !u.CzyZarchiwizowany) &&
-                (string.IsNullOrEmpty(szukanaFraza) || u.PobierzWszystkieDane().Contains(szukanaFraza)) &&
-                (wybraneRoleIds.Count == 0 || u.IdRol.Any(id => wybraneRoleIds.Contains(id)))
+                (slowaKluczowe.Length == 0 || slowaKluczowe.All(slowo => u.PobierzWszystkieDane().Contains(slowo)))
             ).ToList();
 
+            // 4. Nakładanie filtra ról w zależności od tego, kto używa systemu
+            if (czyRecepcja)
+            {
+                // Jeśli to recepcja, "na twardo" wywalamy z wyników każdego, kto nie ma roli Pacjent
+                przefiltrowani = przefiltrowani.Where(u => u.IdRol.Contains(4)).ToList();
+            }
+            else if (czyAdmin && wybraneRoleIds.Count > 0)
+            {
+                // Jeśli to admin, używa zaznaczonych checkboxów
+                przefiltrowani = przefiltrowani.Where(u => u.IdRol.Any(id => wybraneRoleIds.Contains(id))).ToList();
+            }
+
+            // 5. Wyświetlenie wyników
             UstawDataGrid(new BindingList<Uzytkownik>(przefiltrowani));
+
+            if (przefiltrowani.Count == 0 && !string.IsNullOrEmpty(szukanaFraza))
+            {
+                MessageBox.Show("Brak wyników spełniających podane kryteria.", "Informacja", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
         }
 
         private void StworzOknoFormularza(string naglowek, Uzytkownik? uzytkownik, bool czyTylkoOdczyt)

@@ -30,12 +30,9 @@
         {
             textbox_imie = new TextBox();
             textbox_nazwisko = new TextBox();
-            textbox_pesel = new TextBox();
-            textbox_telefon = new TextBox();
             dateTimePicker_dataUrodzenia = new DateTimePicker();
             textbox_email = new TextBox();
             textbox_miejscowosc = new TextBox();
-            textbox_kodPocztowy = new TextBox();
             textbox_ulica = new TextBox();
             textbox_nrMieszkania = new TextBox();
             textbox_nrDomu = new TextBox();
@@ -54,6 +51,9 @@
             label10 = new Label();
             label11 = new Label();
             label12 = new Label();
+            textbox_pesel = new MaskedTextBox();
+            textbox_kodPocztowy = new MaskedTextBox();
+            textbox_telefon = new MaskedTextBox();
             SuspendLayout();
             // 
             // textbox_imie
@@ -69,20 +69,6 @@
             textbox_nazwisko.Name = "textbox_nazwisko";
             textbox_nazwisko.Size = new Size(200, 23);
             textbox_nazwisko.TabIndex = 1;
-            // 
-            // textbox_pesel
-            // 
-            textbox_pesel.Location = new Point(119, 61);
-            textbox_pesel.Name = "textbox_pesel";
-            textbox_pesel.Size = new Size(200, 23);
-            textbox_pesel.TabIndex = 2;
-            // 
-            // textbox_telefon
-            // 
-            textbox_telefon.Location = new Point(119, 148);
-            textbox_telefon.Name = "textbox_telefon";
-            textbox_telefon.Size = new Size(200, 23);
-            textbox_telefon.TabIndex = 3;
             // 
             // dateTimePicker_dataUrodzenia
             // 
@@ -104,13 +90,6 @@
             textbox_miejscowosc.Name = "textbox_miejscowosc";
             textbox_miejscowosc.Size = new Size(200, 23);
             textbox_miejscowosc.TabIndex = 6;
-            // 
-            // textbox_kodPocztowy
-            // 
-            textbox_kodPocztowy.Location = new Point(119, 235);
-            textbox_kodPocztowy.Name = "textbox_kodPocztowy";
-            textbox_kodPocztowy.Size = new Size(200, 23);
-            textbox_kodPocztowy.TabIndex = 7;
             // 
             // textbox_ulica
             // 
@@ -282,10 +261,37 @@
             label12.TabIndex = 27;
             label12.Text = "Numer lokalu";
             // 
+            // textbox_pesel
+            // 
+            textbox_pesel.Location = new Point(119, 61);
+            textbox_pesel.Mask = "00000000000";
+            textbox_pesel.Name = "textbox_pesel";
+            textbox_pesel.Size = new Size(200, 23);
+            textbox_pesel.TabIndex = 28;
+            // 
+            // textbox_kodPocztowy
+            // 
+            textbox_kodPocztowy.Location = new Point(119, 235);
+            textbox_kodPocztowy.Mask = "00-000";
+            textbox_kodPocztowy.Name = "textbox_kodPocztowy";
+            textbox_kodPocztowy.Size = new Size(200, 23);
+            textbox_kodPocztowy.TabIndex = 29;
+            // 
+            // textbox_telefon
+            // 
+            textbox_telefon.Location = new Point(119, 148);
+            textbox_telefon.Mask = "000000000";
+            textbox_telefon.Name = "textbox_telefon";
+            textbox_telefon.Size = new Size(200, 23);
+            textbox_telefon.TabIndex = 30;
+            // 
             // DodajPacjentaPanel
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
+            Controls.Add(textbox_telefon);
+            Controls.Add(textbox_kodPocztowy);
+            Controls.Add(textbox_pesel);
             Controls.Add(label12);
             Controls.Add(label11);
             Controls.Add(label10);
@@ -304,12 +310,9 @@
             Controls.Add(textbox_nrDomu);
             Controls.Add(textbox_nrMieszkania);
             Controls.Add(textbox_ulica);
-            Controls.Add(textbox_kodPocztowy);
             Controls.Add(textbox_miejscowosc);
             Controls.Add(textbox_email);
             Controls.Add(dateTimePicker_dataUrodzenia);
-            Controls.Add(textbox_telefon);
-            Controls.Add(textbox_pesel);
             Controls.Add(textbox_nazwisko);
             Controls.Add(textbox_imie);
             Name = "DodajPacjentaPanel";
@@ -322,12 +325,9 @@
 
         private TextBox textbox_imie;
         private TextBox textbox_nazwisko;
-        private TextBox textbox_pesel;
-        private TextBox textbox_telefon;
         private DateTimePicker dateTimePicker_dataUrodzenia;
         private TextBox textbox_email;
         private TextBox textbox_miejscowosc;
-        private TextBox textbox_kodPocztowy;
         private TextBox textbox_ulica;
         private TextBox textbox_nrMieszkania;
         private TextBox textbox_nrDomu;
@@ -346,5 +346,8 @@
         private Label label10;
         private Label label11;
         private Label label12;
+        private MaskedTextBox textbox_pesel;
+        private MaskedTextBox textbox_kodPocztowy;
+        private MaskedTextBox textbox_telefon;
     }
 }
