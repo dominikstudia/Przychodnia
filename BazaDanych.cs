@@ -12,7 +12,7 @@ namespace Przychodnia
 {
     internal class BazaDanych
     {
-        public static readonly string POLACZENIE_STRING = @"Server=(localdb)\Local;Database=Przychodnia;Trusted_Connection=True;TrustServerCertificate=True;";
+        public static readonly string POLACZENIE_STRING = @"Server=localhost\SQLEXPRESS;Database=Przychodnia;Trusted_Connection=True;TrustServerCertificate=True;";
 
         public static BindingList<Uzytkownik> Uzytkownicy { get; set; } = new BindingList<Uzytkownik>();
         public static Uzytkownik? ZALOGOWANY_UZYTKOWNIK { get; set; } = null;
@@ -756,6 +756,7 @@ namespace Przychodnia
             tabelaWynikowa.Columns.Add("ID Wizyty", typeof(int));
             tabelaWynikowa.Columns.Add("Data i Godzina", typeof(DateTime));
             tabelaWynikowa.Columns.Add("Imię i Nazwisko Pacjenta", typeof(string));
+            tabelaWynikowa.Columns.Add("PESEL", typeof(string));
             tabelaWynikowa.Columns.Add("Imię i Nazwisko Lekarza", typeof(string));
             tabelaWynikowa.Columns.Add("Specjalizacja", typeof(string));
             tabelaWynikowa.Columns.Add("Numer Gabinetu", typeof(string));
@@ -773,6 +774,7 @@ namespace Przychodnia
                             v.VisitID,
                             v.VisitDateTime,
                             u_pat.FirstName + ' ' + u_pat.LastName AS Pacjent,
+                            u_pat.PESEL,
                             u_doc.FirstName + ' ' + u_doc.LastName AS Lekarz,
                             s.Name AS Specjalizacja,
                             r.RoomNumber,
@@ -810,6 +812,7 @@ namespace Przychodnia
                                     Convert.ToInt32(czytnik["VisitID"]),
                                     Convert.ToDateTime(czytnik["VisitDateTime"]),
                                     czytnik["Pacjent"].ToString(),
+                                    czytnik["PESEL"].ToString(),
                                     czytnik["Lekarz"].ToString(),
                                     czytnik["Specjalizacja"].ToString(),
                                     czytnik["RoomNumber"].ToString(),

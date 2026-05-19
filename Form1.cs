@@ -108,7 +108,7 @@ namespace Przychodnia
         {
             panel_edycji.Controls.Clear();
 
-            ListaWizytPanel formularz = new ListaWizytPanel(BazaDanych.ZALOGOWANY_UZYTKOWNIK);
+            ListaWizytPanel formularz = new ListaWizytPanel();
             formularz.Dock = DockStyle.Fill;
             panel_edycji.Controls.Add(formularz);
 
