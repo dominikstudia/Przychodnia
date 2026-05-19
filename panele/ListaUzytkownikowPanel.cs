@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Przychodnia.panele;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -57,6 +58,7 @@ namespace Przychodnia
                 btn_edytuj.Visible = true;
                 btn_archiwizuj.Visible = false;
                 btn_dodaj.Visible = false;
+                przycisk_zarejestruj_wizyte.Visible = true;
 
                 // Ukrywamy listę, ale zaznaczamy w niej Pacjentów (ID 4)
                 checkedlistbox_filtr_roli.Visible = false;
@@ -208,6 +210,39 @@ namespace Przychodnia
             if (datagrid_uzytkownicy.SelectedRows[0].DataBoundItem is not Uzytkownik wybrany) return;
 
             StworzOknoFormularza("Szczegóły", wybrany, true);
+        }
+
+        private void przycisk_zarejestruj_wizyte_Click(object sender, EventArgs e)
+        {
+            // 1. Sprawdzamy, czy wybrano jakikolwiek wiersz
+            if (datagrid_uzytkownicy.SelectedRows.Count == 0)
+            {
+                MessageBox.Show("Proszę najpierw wybrać pacjenta z listy.", "Brak wyboru", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            // 2. Pobieramy obiekt użytkownika
+            if (datagrid_uzytkownicy.SelectedRows[0].DataBoundItem is not Uzytkownik wybranyPacjent) return;
+
+            // 3. Zabezpieczenie: czy to na pewno pacjent? (Zakładając, że rola 4 to Pacjent)
+            if (!wybranyPacjent.IdRol.Contains(4))
+            {
+                MessageBox.Show("Wizytę można zaplanować wyłącznie dla pacjenta.", "Niedozwolona operacja", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            // 4. Tworzymy i wyświetlamy okno rejestracji wizyty
+            Form oknoRejestracji = new Form();
+            oknoRejestracji.Text = $"Rejestracja wizyty: {wybranyPacjent.Imiona} {wybranyPacjent.Nazwisko}";
+            oknoRejestracji.StartPosition = FormStartPosition.CenterScreen;
+            oknoRejestracji.Size = new Size(450, 400);
+
+            // Przekazujemy wybranego pacjenta do nowego panelu (który zaraz stworzymy)
+            RejestracjaWizytyPanel panel = new RejestracjaWizytyPanel(wybranyPacjent);
+            panel.Dock = DockStyle.Fill;
+
+            oknoRejestracji.Controls.Add(panel);
+            oknoRejestracji.ShowDialog();
         }
     }
 }

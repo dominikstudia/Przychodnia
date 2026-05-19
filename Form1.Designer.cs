@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             panel_boczny = new Panel();
+            przycisk_lista_wizyt = new Button();
             przycisk_dodaj_pacjenta = new Button();
             btn_zmien_haslo = new Button();
             btn_wyloguj = new Button();
@@ -45,6 +46,7 @@
             // panel_boczny
             // 
             panel_boczny.BackColor = SystemColors.ControlDark;
+            panel_boczny.Controls.Add(przycisk_lista_wizyt);
             panel_boczny.Controls.Add(przycisk_dodaj_pacjenta);
             panel_boczny.Controls.Add(btn_zmien_haslo);
             panel_boczny.Controls.Add(btn_wyloguj);
@@ -56,6 +58,18 @@
             panel_boczny.Name = "panel_boczny";
             panel_boczny.Size = new Size(200, 581);
             panel_boczny.TabIndex = 0;
+            // 
+            // przycisk_lista_wizyt
+            // 
+            przycisk_lista_wizyt.Dock = DockStyle.Top;
+            przycisk_lista_wizyt.Location = new Point(0, 210);
+            przycisk_lista_wizyt.Name = "przycisk_lista_wizyt";
+            przycisk_lista_wizyt.Size = new Size(200, 70);
+            przycisk_lista_wizyt.TabIndex = 6;
+            przycisk_lista_wizyt.Text = "Lista Wizyt";
+            przycisk_lista_wizyt.UseVisualStyleBackColor = true;
+            przycisk_lista_wizyt.Visible = false;
+            przycisk_lista_wizyt.Click += btn_dodaj_wizyte_Click;
             // 
             // przycisk_dodaj_pacjenta
             // 
@@ -183,5 +197,6 @@
         private Button btn_wyloguj;
         private Button btn_zmien_haslo;
         private Button przycisk_dodaj_pacjenta;
+        private Button przycisk_lista_wizyt;
     }
 }

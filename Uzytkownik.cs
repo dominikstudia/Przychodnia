@@ -39,7 +39,10 @@ namespace Przychodnia
 
             return rola != null && IdRol.Contains(rola.Id);
         }
-
+        public string PelneNazwisko
+        {
+            get { return $"{Imiona} {Nazwisko}"; }
+        }
 
         public List<int> IdRol { get; set; } = new List<int>();
     }

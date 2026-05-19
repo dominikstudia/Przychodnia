@@ -29,16 +29,17 @@
         private void InitializeComponent()
         {
             panel1 = new Panel();
+            checkedlistbox_filtr_roli = new CheckedListBox();
             checkbox_uwzglednienie_zarchwizowanych = new CheckBox();
             btn_szukaj = new Button();
             textbox_wyszukiwanie = new TextBox();
             panel2 = new Panel();
+            przycisk_zarejestruj_wizyte = new Button();
             btn_edytuj = new Button();
             btn_podglad_szczegolow = new Button();
             btn_archiwizuj = new Button();
             btn_dodaj = new Button();
             datagrid_uzytkownicy = new DataGridView();
-            checkedlistbox_filtr_roli = new CheckedListBox();
             panel1.SuspendLayout();
             panel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)datagrid_uzytkownicy).BeginInit();
@@ -53,8 +54,16 @@
             panel1.Dock = DockStyle.Top;
             panel1.Location = new Point(0, 0);
             panel1.Name = "panel1";
-            panel1.Size = new Size(740, 96);
+            panel1.Size = new Size(941, 96);
             panel1.TabIndex = 0;
+            // 
+            // checkedlistbox_filtr_roli
+            // 
+            checkedlistbox_filtr_roli.FormattingEnabled = true;
+            checkedlistbox_filtr_roli.Location = new Point(395, 13);
+            checkedlistbox_filtr_roli.Name = "checkedlistbox_filtr_roli";
+            checkedlistbox_filtr_roli.Size = new Size(120, 76);
+            checkedlistbox_filtr_roli.TabIndex = 5;
             // 
             // checkbox_uwzglednienie_zarchwizowanych
             // 
@@ -88,6 +97,7 @@
             // 
             // panel2
             // 
+            panel2.Controls.Add(przycisk_zarejestruj_wizyte);
             panel2.Controls.Add(btn_edytuj);
             panel2.Controls.Add(btn_podglad_szczegolow);
             panel2.Controls.Add(btn_archiwizuj);
@@ -95,8 +105,18 @@
             panel2.Dock = DockStyle.Bottom;
             panel2.Location = new Point(0, 408);
             panel2.Name = "panel2";
-            panel2.Size = new Size(740, 81);
+            panel2.Size = new Size(941, 81);
             panel2.TabIndex = 1;
+            // 
+            // przycisk_zarejestruj_wizyte
+            // 
+            przycisk_zarejestruj_wizyte.Location = new Point(743, 14);
+            przycisk_zarejestruj_wizyte.Name = "przycisk_zarejestruj_wizyte";
+            przycisk_zarejestruj_wizyte.Size = new Size(168, 54);
+            przycisk_zarejestruj_wizyte.TabIndex = 4;
+            przycisk_zarejestruj_wizyte.Text = "Zarejestruj Wizyte";
+            przycisk_zarejestruj_wizyte.UseVisualStyleBackColor = true;
+            przycisk_zarejestruj_wizyte.Click += przycisk_zarejestruj_wizyte_Click;
             // 
             // btn_edytuj
             // 
@@ -156,16 +176,8 @@
             datagrid_uzytkownicy.ReadOnly = true;
             datagrid_uzytkownicy.RowHeadersVisible = false;
             datagrid_uzytkownicy.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            datagrid_uzytkownicy.Size = new Size(740, 312);
+            datagrid_uzytkownicy.Size = new Size(941, 312);
             datagrid_uzytkownicy.TabIndex = 2;
-            // 
-            // checkedlistbox_filtr_roli
-            // 
-            checkedlistbox_filtr_roli.FormattingEnabled = true;
-            checkedlistbox_filtr_roli.Location = new Point(395, 13);
-            checkedlistbox_filtr_roli.Name = "checkedlistbox_filtr_roli";
-            checkedlistbox_filtr_roli.Size = new Size(120, 76);
-            checkedlistbox_filtr_roli.TabIndex = 5;
             // 
             // ListaUzytkownikowPanel
             // 
@@ -175,7 +187,7 @@
             Controls.Add(panel2);
             Controls.Add(panel1);
             Name = "ListaUzytkownikowPanel";
-            Size = new Size(740, 489);
+            Size = new Size(941, 489);
             panel1.ResumeLayout(false);
             panel1.PerformLayout();
             panel2.ResumeLayout(false);
@@ -196,5 +208,6 @@
         private Button btn_dodaj;
         private DataGridView datagrid_uzytkownicy;
         private CheckedListBox checkedlistbox_filtr_roli;
+        private Button przycisk_zarejestruj_wizyte;
     }
 }

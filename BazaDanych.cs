@@ -12,7 +12,7 @@ namespace Przychodnia
 {
     internal class BazaDanych
     {
-        public static readonly string POLACZENIE_STRING = @"Server=KAKUR\SQLEXPRESS01;Database=Przychodnia;Trusted_Connection=True;TrustServerCertificate=True;";
+        public static readonly string POLACZENIE_STRING = @"Server=(localdb)\Local;Database=Przychodnia;Trusted_Connection=True;TrustServerCertificate=True;";
 
         public static BindingList<Uzytkownik> Uzytkownicy { get; set; } = new BindingList<Uzytkownik>();
         public static Uzytkownik? ZALOGOWANY_UZYTKOWNIK { get; set; } = null;
@@ -545,5 +545,287 @@ namespace Przychodnia
             return Uzytkownicy.Any(u => u.Email != null && u.Email.ToLower() == email.ToLower() && u.Id != idOmijanegoUzytkownika);
         }
 
+        // =========================================================================
+        // METODY DO OBSŁUGI REJESTRACJI WIZYT (ZGODNIE ZE SCHEMATEM BAZY I UC_WIZ_01)
+        // =========================================================================
+
+        /// <summary>
+        /// Pobiera listę wszystkich dostępnych specjalizacji medycznych.
+        /// </summary>
+        public static List<string> PobierzSpecjalizacje()
+        {
+            List<string> specjalizacje = new List<string>();
+            try
+            {
+                using (var polaczenie = new Microsoft.Data.SqlClient.SqlConnection(POLACZENIE_STRING))
+                {
+                    polaczenie.Open();
+                    string sql = "SELECT Name FROM Specializations ORDER BY Name ASC";
+                    using (var cmd = new Microsoft.Data.SqlClient.SqlCommand(sql, polaczenie))
+                    using (var czytnik = cmd.ExecuteReader())
+                    {
+                        while (czytnik.Read())
+                        {
+                            specjalizacje.Add(czytnik["Name"].ToString() ?? "");
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Błąd pobierania specjalizacji: " + ex.Message, "Błąd bazy danych", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            return specjalizacje;
+        }
+
+        /// <summary>
+        /// Pobiera lekarzy przefiltrowanych po wybranej specjalizacji (zgodnie z wymaganiem funkcjonalnym UC_WIZ_01).
+        /// </summary>
+        public static List<Uzytkownik> PobierzLekarzyPoSpecjalizacji(string nazwaSpecjalizacji)
+        {
+            List<Uzytkownik> lekarze = new List<Uzytkownik>();
+            try
+            {
+                using (var polaczenie = new Microsoft.Data.SqlClient.SqlConnection(POLACZENIE_STRING))
+                {
+                    polaczenie.Open();
+                    // Łączymy tabelę Users z Doctors oraz Specializations na podstawie kluczy obcych ze schematu
+                    string sql = @"SELECT u.UserID, u.FirstName, u.LastName 
+                                   FROM Users u
+                                   JOIN Doctors d ON u.UserID = d.UserID
+                                   JOIN Specializations s ON d.SpecializationID = s.SpecializationID
+                                   WHERE s.Name = @SpecName AND u.IsArchived = 0";
+
+                    using (var cmd = new Microsoft.Data.SqlClient.SqlCommand(sql, polaczenie))
+                    {
+                        cmd.Parameters.AddWithValue("@SpecName", nazwaSpecjalizacji);
+                        using (var czytnik = cmd.ExecuteReader())
+                        {
+                            while (czytnik.Read())
+                            {
+                                // Tworzymy obiekt użytkownika z danymi potrzebnymi do identyfikacji lekarza
+                                lekarze.Add(new Uzytkownik
+                                {
+                                    Id = Convert.ToInt32(czytnik["UserID"]),
+                                    Imiona = czytnik["FirstName"].ToString(),
+                                    Nazwisko = czytnik["LastName"].ToString()
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Błąd pobierania lekarzy: " + ex.Message, "Błąd bazy danych", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            return lekarze;
+        }
+
+        /// <summary>
+        /// Pobiera listę wszystkich gabinetów lekarskich (pokojów).
+        /// </summary>
+        public static List<string> PobierzGabinety()
+        {
+            List<string> gabinety = new List<string>();
+            try
+            {
+                using (var polaczenie = new Microsoft.Data.SqlClient.SqlConnection(POLACZENIE_STRING))
+                {
+                    polaczenie.Open();
+                    string sql = "SELECT RoomNumber FROM Rooms ORDER BY RoomNumber ASC";
+                    using (var cmd = new Microsoft.Data.SqlClient.SqlCommand(sql, polaczenie))
+                    using (var czytnik = cmd.ExecuteReader())
+                    {
+                        while (czytnik.Read())
+                        {
+                            gabinety.Add(czytnik["RoomNumber"].ToString() ?? "");
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Błąd pobierania gabinetów: " + ex.Message, "Błąd bazy danych", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            return gabinety;
+        }
+
+        /// <summary>
+        /// Rejestruje nową wizytę w bazie danych, weryfikując uprzednio wszystkie warunki biznesowe i wyjątki z dokumentacji.
+        /// </summary>
+        public static (bool Sukces, string Komunikat) ZarejestrujWizyte(int idPacjentaUzytkownik, int idLekarzaUzytkownik, string numerGabinetu, DateTime dataGodzinaWizyty)
+        {
+            // E1: Walidacja daty z przeszłości
+            if (dataGodzinaWizyty < DateTime.Now)
+            {
+                return (false, "Nie można zaplanować wizyty z datą wsteczną."); // Zgodnie z E1 w UC_WIZ_01
+            }
+
+            try
+            {
+                using (var polaczenie = new Microsoft.Data.SqlClient.SqlConnection(POLACZENIE_STRING))
+                {
+                    polaczenie.Open();
+
+                    // --- KROK 1: Pobranie ID z tabeli Doctors na podstawie UserID lekarza ---
+                    int doctorId = 0;
+                    string sqlDoc = "SELECT DoctorID FROM Doctors WHERE UserID = @UID";
+                    using (var cmdDoc = new Microsoft.Data.SqlClient.SqlCommand(sqlDoc, polaczenie))
+                    {
+                        cmdDoc.Parameters.AddWithValue("@UID", idLekarzaUzytkownik);
+                        var res = cmdDoc.ExecuteScalar();
+                        if (res == null) return (false, "Nie odnaleziono powiązanego profilu lekarza.");
+                        doctorId = Convert.ToInt32(res);
+                    }
+
+                    // --- KROK 2: Pobranie ID z tabeli Patients na podstawie UserID pacjenta ---
+                    int patientId = 0;
+                    string sqlPat = "SELECT PatientID FROM Patients WHERE UserID = @UID";
+                    using (var cmdPat = new Microsoft.Data.SqlClient.SqlCommand(sqlPat, polaczenie))
+                    {
+                        cmdPat.Parameters.AddWithValue("@UID", idPacjentaUzytkownik);
+                        var res = cmdPat.ExecuteScalar();
+                        if (res == null) return (false, "Nie odnaleziono powiązanego profilu pacjenta.");
+                        patientId = Convert.ToInt32(res);
+                    }
+
+                    // --- KROK 3: Pobranie RoomID na podstawie numeru gabinetu ---
+                    int roomId = 0;
+                    string sqlRoom = "SELECT RoomID FROM Rooms WHERE RoomNumber = @RNum";
+                    using (var cmdRoom = new Microsoft.Data.SqlClient.SqlCommand(sqlRoom, polaczenie))
+                    {
+                        cmdRoom.Parameters.AddWithValue("@RNum", numerGabinetu);
+                        var res = cmdRoom.ExecuteScalar();
+                        if (res == null) return (false, "Nie odnaleziono wskazanego gabinetu w bazie.");
+                        roomId = Convert.ToInt32(res);
+                    }
+
+                    // --- KROK 4: E2 - Walidacja konfliktu terminów lekarza ---
+                    string sqlCheckDoctor = "SELECT COUNT(1) FROM Visits WHERE DoctorID = @DocID AND VisitDateTime = @VTime AND Status != 'Anulowana'";
+                    using (var cmdCheckDoc = new Microsoft.Data.SqlClient.SqlCommand(sqlCheckDoctor, polaczenie))
+                    {
+                        cmdCheckDoc.Parameters.AddWithValue("@DocID", doctorId);
+                        cmdCheckDoc.Parameters.AddWithValue("@VTime", dataGodzinaWizyty);
+                        if (Convert.ToInt32(cmdCheckDoc.ExecuteScalar()) > 0)
+                        {
+                            return (false, "Lekarz jest niedostępny w wybranym terminie. Wybierz inną godzinę."); // Zgodnie z E2
+                        }
+                    }
+
+                    // --- KROK 5: E3 - Walidacja konfliktu gabinetu ---
+                    string sqlCheckRoom = "SELECT COUNT(1) FROM Visits WHERE RoomID = @RoomID AND VisitDateTime = @VTime AND Status != 'Anulowana'";
+                    using (var cmdCheckRoom = new Microsoft.Data.SqlClient.SqlCommand(sqlCheckRoom, polaczenie))
+                    {
+                        cmdCheckRoom.Parameters.AddWithValue("@RoomID", roomId);
+                        cmdCheckRoom.Parameters.AddWithValue("@VTime", dataGodzinaWizyty);
+                        if (Convert.ToInt32(cmdCheckRoom.ExecuteScalar()) > 0)
+                        {
+                            return (false, "Wybrany gabinet jest przypisany do innej wizyty w tym czasie."); // Zgodnie z E3 (wymuszenie zmiany)
+                        }
+                    }
+
+                    // --- KROK 6: Zapisanie rekordu do tabeli Visits (Warunek końcowy: Status „Zarejestrowana”) ---
+                    string sqlInsert = @"INSERT INTO Visits (PatientID, DoctorID, RoomID, VisitDateTime, Status) 
+                                         VALUES (@PatientID, @DoctorID, @RoomID, @VisitDateTime, @Status)";
+
+                    using (var cmdInsert = new Microsoft.Data.SqlClient.SqlCommand(sqlInsert, polaczenie))
+                    {
+                        cmdInsert.Parameters.AddWithValue("@PatientID", patientId);
+                        cmdInsert.Parameters.AddWithValue("@DoctorID", doctorId);
+                        cmdInsert.Parameters.AddWithValue("@RoomID", roomId);
+                        cmdInsert.Parameters.AddWithValue("@VisitDateTime", dataGodzinaWizyty);
+                        cmdInsert.Parameters.AddWithValue("@Status", "Zarejestrowana"); // Zgodnie z warunkiem końcowym
+
+                        cmdInsert.ExecuteNonQuery();
+                    }
+
+                    return (true, "Wizyta została pomyślnie zarejestrowana w systemie.");
+                }
+            }
+            catch (Exception ex)
+            {
+                return (false, "Błąd krytyczny bazy danych: " + ex.Message);
+            }
+        }
+        public static DataTable PobierzListeWizyt(Uzytkownik zalogowanyUzytkownik)
+        {
+            DataTable tabelaWynikowa = new DataTable();
+
+            // Definiujemy dokładnie takie kolumny, jakich wymaga dokumentacja (UC_WIZ_02)
+            tabelaWynikowa.Columns.Add("ID Wizyty", typeof(int));
+            tabelaWynikowa.Columns.Add("Data i Godzina", typeof(DateTime));
+            tabelaWynikowa.Columns.Add("Imię i Nazwisko Pacjenta", typeof(string));
+            tabelaWynikowa.Columns.Add("Imię i Nazwisko Lekarza", typeof(string));
+            tabelaWynikowa.Columns.Add("Specjalizacja", typeof(string));
+            tabelaWynikowa.Columns.Add("Numer Gabinetu", typeof(string));
+            tabelaWynikowa.Columns.Add("Status Wizyty", typeof(string));
+
+            try
+            {
+                using (var polaczenie = new Microsoft.Data.SqlClient.SqlConnection(POLACZENIE_STRING))
+                {
+                    polaczenie.Open();
+
+                    // Podstawowe zapytanie łączące relacje ze schematu bazy danych
+                    string sql = @"
+                        SELECT 
+                            v.VisitID,
+                            v.VisitDateTime,
+                            u_pat.FirstName + ' ' + u_pat.LastName AS Pacjent,
+                            u_doc.FirstName + ' ' + u_doc.LastName AS Lekarz,
+                            s.Name AS Specjalizacja,
+                            r.RoomNumber,
+                            v.Status
+                        FROM Visits v
+                        JOIN Patients p ON v.PatientID = p.PatientID
+                        JOIN Users u_pat ON p.UserID = u_pat.UserID
+                        JOIN Doctors d ON v.DoctorID = d.DoctorID
+                        JOIN Users u_doc ON d.UserID = u_doc.UserID
+                        JOIN Specializations s ON d.SpecializationID = s.SpecializationID
+                        JOIN Rooms r ON v.RoomID = r.RoomID";
+
+                    // Autoryzacja uprawnień (UC_WIZ_02): Jeśli to Lekarz (założenie: IdRol == 2), filtrujemy po jego UserID
+                    // Jeśli zalogowany użytkownik to Recepcjonista, warunek WHERE nie zostanie dodany i zobaczy wszystko
+                    if (zalogowanyUzytkownik.IdRol.Contains(2))
+                    {
+                        sql += " WHERE u_doc.UserID = @LekarzUserID";
+                    }
+
+                    // Wymaganie: Sortowanie chronologiczne
+                    sql += " ORDER BY v.VisitDateTime ASC";
+
+                    using (var cmd = new Microsoft.Data.SqlClient.SqlCommand(sql, polaczenie))
+                    {
+                        if (zalogowanyUzytkownik.IdRol.Contains(2))
+                        {
+                            cmd.Parameters.AddWithValue("@LekarzUserID", zalogowanyUzytkownik.Id);
+                        }
+
+                        using (var czytnik = cmd.ExecuteReader())
+                        {
+                            while (czytnik.Read())
+                            {
+                                tabelaWynikowa.Rows.Add(
+                                    Convert.ToInt32(czytnik["VisitID"]),
+                                    Convert.ToDateTime(czytnik["VisitDateTime"]),
+                                    czytnik["Pacjent"].ToString(),
+                                    czytnik["Lekarz"].ToString(),
+                                    czytnik["Specjalizacja"].ToString(),
+                                    czytnik["RoomNumber"].ToString(),
+                                    czytnik["Status"].ToString()
+                                );
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Błąd podczas pobierania listy wizyt: " + ex.Message, "Błąd bazy danych", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+
+            return tabelaWynikowa;
+        }
     }
 }

@@ -1,4 +1,5 @@
 using Przychodnia.formsy;
+using Przychodnia.panele;
 using System.Data;
 
 namespace Przychodnia
@@ -33,11 +34,13 @@ namespace Przychodnia
 
             bool czyAdmin = BazaDanych.ZALOGOWANY_UZYTKOWNIK.IdRol.Contains(1);
             bool czyRecepcjonista = BazaDanych.ZALOGOWANY_UZYTKOWNIK.IdRol.Contains(3);
+            bool czyLekarz = BazaDanych.ZALOGOWANY_UZYTKOWNIK.IdRol.Contains(2);
 
             przycisk_dodaj_uzytkownika.Visible = czyAdmin;
             przycisk_przeglad_uprawnien.Visible = czyAdmin;
             przycisk_dodaj_pacjenta.Visible = czyRecepcjonista;
             przycisk_wyszukaj_uzytkownika.Visible = (czyAdmin || czyRecepcjonista);
+            przycisk_lista_wizyt.Visible = (czyLekarz || czyRecepcjonista);
 
             przycisk_wyszukaj_uzytkownika.Text = czyAdmin ? "Lista użytkowników" : "Wyszukaj pacjenta";
         }
@@ -99,6 +102,17 @@ namespace Przychodnia
             panel_edycji.Controls.Add(formularz);
 
             label_ogolny.Text = "Rejestracja nowego pacjenta";
+        }
+
+        private void btn_dodaj_wizyte_Click(object sender, EventArgs e)
+        {
+            panel_edycji.Controls.Clear();
+
+            ListaWizytPanel formularz = new ListaWizytPanel(BazaDanych.ZALOGOWANY_UZYTKOWNIK);
+            formularz.Dock = DockStyle.Fill;
+            panel_edycji.Controls.Add(formularz);
+
+            label_ogolny.Text = "Przegląd wizyt pacjentów";
         }
     }
 }
