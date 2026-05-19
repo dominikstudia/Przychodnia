@@ -42,6 +42,7 @@
             panel1 = new Panel();
             lbl_komunikat = new Label();
             datagridview_wizyty = new DataGridView();
+            btn_szczegoly = new Button();
             panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)datagridview_wizyty).BeginInit();
             SuspendLayout();
@@ -57,9 +58,9 @@
             // btn_szukaj
             // 
             btn_szukaj.Font = new Font("Segoe UI", 12F);
-            btn_szukaj.Location = new Point(443, 95);
+            btn_szukaj.Location = new Point(650, 96);
             btn_szukaj.Name = "btn_szukaj";
-            btn_szukaj.Size = new Size(406, 37);
+            btn_szukaj.Size = new Size(199, 37);
             btn_szukaj.TabIndex = 3;
             btn_szukaj.Text = "Szukaj";
             btn_szukaj.UseVisualStyleBackColor = true;
@@ -149,6 +150,7 @@
             // 
             // panel1
             // 
+            panel1.Controls.Add(btn_szczegoly);
             panel1.Controls.Add(btn_szukaj);
             panel1.Controls.Add(label_imie_nazwisko_pesel);
             panel1.Controls.Add(cmb_specjalizacja);
@@ -187,6 +189,17 @@
             datagridview_wizyty.Size = new Size(837, 418);
             datagridview_wizyty.TabIndex = 0;
             // 
+            // btn_szczegoly
+            // 
+            btn_szczegoly.Font = new Font("Segoe UI", 12F);
+            btn_szczegoly.Location = new Point(445, 96);
+            btn_szczegoly.Name = "btn_szczegoly";
+            btn_szczegoly.Size = new Size(199, 37);
+            btn_szczegoly.TabIndex = 14;
+            btn_szczegoly.Text = "Szczegóły wizyty";
+            btn_szczegoly.UseVisualStyleBackColor = true;
+            btn_szczegoly.Click += btn_szczegoly_Click;
+            // 
             // ListaWizytPanel
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -217,5 +230,6 @@
         private ComboBox cmb_specjalizacja;
         private Panel panel1;
         private Label lbl_komunikat;
+        private Button btn_szczegoly;
     }
 }
