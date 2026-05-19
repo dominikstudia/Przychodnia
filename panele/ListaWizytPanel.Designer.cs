@@ -30,6 +30,7 @@
         {
             datagridview_wizyty = new DataGridView();
             lbl_komunikat = new Label();
+            btn_szczegoly = new Button();
             ((System.ComponentModel.ISupportInitialize)datagridview_wizyty).BeginInit();
             SuspendLayout();
             // 
@@ -49,14 +50,25 @@
             lbl_komunikat.Size = new Size(0, 15);
             lbl_komunikat.TabIndex = 1;
             // 
+            // btn_szczegoly
+            // 
+            btn_szczegoly.Location = new Point(502, 429);
+            btn_szczegoly.Name = "btn_szczegoly";
+            btn_szczegoly.Size = new Size(235, 59);
+            btn_szczegoly.TabIndex = 2;
+            btn_szczegoly.Text = "Szczegóły wizyty";
+            btn_szczegoly.UseVisualStyleBackColor = true;
+            btn_szczegoly.Click += btn_szczegoly_Click;
+            // 
             // ListaWizytPanel
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
+            Controls.Add(btn_szczegoly);
             Controls.Add(lbl_komunikat);
             Controls.Add(datagridview_wizyty);
             Name = "ListaWizytPanel";
-            Size = new Size(740, 426);
+            Size = new Size(740, 491);
             ((System.ComponentModel.ISupportInitialize)datagridview_wizyty).EndInit();
             ResumeLayout(false);
             PerformLayout();
@@ -66,5 +78,6 @@
 
         private DataGridView datagridview_wizyty;
         private Label lbl_komunikat;
+        private Button btn_szczegoly;
     }
 }

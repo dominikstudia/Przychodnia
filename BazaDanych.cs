@@ -12,7 +12,7 @@ namespace Przychodnia
 {
     internal class BazaDanych
     {
-        public static readonly string POLACZENIE_STRING = @"Server=(localdb)\Local;Database=Przychodnia;Trusted_Connection=True;TrustServerCertificate=True;";
+        public static readonly string POLACZENIE_STRING = @"Server=KAKUR\SQLEXPRESS01;Database=Przychodnia;Trusted_Connection=True;TrustServerCertificate=True;";
 
         public static BindingList<Uzytkownik> Uzytkownicy { get; set; } = new BindingList<Uzytkownik>();
         public static Uzytkownik? ZALOGOWANY_UZYTKOWNIK { get; set; } = null;
@@ -752,7 +752,6 @@ namespace Przychodnia
         {
             DataTable tabelaWynikowa = new DataTable();
 
-            // Definiujemy dokładnie takie kolumny, jakich wymaga dokumentacja (UC_WIZ_02)
             tabelaWynikowa.Columns.Add("ID Wizyty", typeof(int));
             tabelaWynikowa.Columns.Add("Data i Godzina", typeof(DateTime));
             tabelaWynikowa.Columns.Add("Imię i Nazwisko Pacjenta", typeof(string));
@@ -761,38 +760,40 @@ namespace Przychodnia
             tabelaWynikowa.Columns.Add("Numer Gabinetu", typeof(string));
             tabelaWynikowa.Columns.Add("Status Wizyty", typeof(string));
 
+            // Pola techniczne, ukryte w widoku interfejsu użytkownika
+            tabelaWynikowa.Columns.Add("Schorzenia", typeof(string));
+            tabelaWynikowa.Columns.Add("Zalecenia", typeof(string));
+
             try
             {
                 using (var polaczenie = new Microsoft.Data.SqlClient.SqlConnection(POLACZENIE_STRING))
                 {
                     polaczenie.Open();
-
-                    // Podstawowe zapytanie łączące relacje ze schematu bazy danych
                     string sql = @"
-                        SELECT 
-                            v.VisitID,
-                            v.VisitDateTime,
-                            u_pat.FirstName + ' ' + u_pat.LastName AS Pacjent,
-                            u_doc.FirstName + ' ' + u_doc.LastName AS Lekarz,
-                            s.Name AS Specjalizacja,
-                            r.RoomNumber,
-                            v.Status
-                        FROM Visits v
-                        JOIN Patients p ON v.PatientID = p.PatientID
-                        JOIN Users u_pat ON p.UserID = u_pat.UserID
-                        JOIN Doctors d ON v.DoctorID = d.DoctorID
-                        JOIN Users u_doc ON d.UserID = u_doc.UserID
-                        JOIN Specializations s ON d.SpecializationID = s.SpecializationID
-                        JOIN Rooms r ON v.RoomID = r.RoomID";
+                SELECT 
+                    v.VisitID,
+                    v.VisitDateTime,
+                    u_pat.FirstName + ' ' + u_pat.LastName AS Pacjent,
+                    u_doc.FirstName + ' ' + u_doc.LastName AS Lekarz,
+                    s.Name AS Specjalizacja,
+                    r.RoomNumber,
+                    v.Status,
+                    vr.Symptoms,
+                    vr.Recommendations
+                FROM Visits v
+                JOIN Patients p ON v.PatientID = p.PatientID
+                JOIN Users u_pat ON p.UserID = u_pat.UserID
+                JOIN Doctors d ON v.DoctorID = d.DoctorID
+                JOIN Users u_doc ON d.UserID = u_doc.UserID
+                JOIN Specializations s ON d.SpecializationID = s.SpecializationID
+                JOIN Rooms r ON v.RoomID = r.RoomID
+                LEFT JOIN VisitResults vr ON v.VisitID = vr.VisitID";
 
-                    // Autoryzacja uprawnień (UC_WIZ_02): Jeśli to Lekarz (założenie: IdRol == 2), filtrujemy po jego UserID
-                    // Jeśli zalogowany użytkownik to Recepcjonista, warunek WHERE nie zostanie dodany i zobaczy wszystko
                     if (zalogowanyUzytkownik.IdRol.Contains(2))
                     {
                         sql += " WHERE u_doc.UserID = @LekarzUserID";
                     }
 
-                    // Wymaganie: Sortowanie chronologiczne
                     sql += " ORDER BY v.VisitDateTime ASC";
 
                     using (var cmd = new Microsoft.Data.SqlClient.SqlCommand(sql, polaczenie))
@@ -813,7 +814,9 @@ namespace Przychodnia
                                     czytnik["Lekarz"].ToString(),
                                     czytnik["Specjalizacja"].ToString(),
                                     czytnik["RoomNumber"].ToString(),
-                                    czytnik["Status"].ToString()
+                                    czytnik["Status"].ToString(),
+                                    czytnik["Symptoms"] != DBNull.Value ? czytnik["Symptoms"].ToString() : "",
+                                    czytnik["Recommendations"] != DBNull.Value ? czytnik["Recommendations"].ToString() : ""
                                 );
                             }
                         }
@@ -826,6 +829,48 @@ namespace Przychodnia
             }
 
             return tabelaWynikowa;
+        }
+
+        public static bool AktualizujWynikiWizyty(Wizyta wizyta)
+        {
+            try
+            {
+                using (var polaczenie = new Microsoft.Data.SqlClient.SqlConnection(POLACZENIE_STRING))
+                {
+                    polaczenie.Open();
+
+                    string sqlVisits = "UPDATE Visits SET Status = @Status WHERE VisitID = @VisitID";
+                    using (var cmdVisits = new Microsoft.Data.SqlClient.SqlCommand(sqlVisits, polaczenie))
+                    {
+                        cmdVisits.Parameters.AddWithValue("@Status", wizyta.Status);
+                        cmdVisits.Parameters.AddWithValue("@VisitID", wizyta.IdWizyty);
+                        cmdVisits.ExecuteNonQuery();
+                    }
+
+                    string sqlResults = @"
+                IF EXISTS (SELECT 1 FROM VisitResults WHERE VisitID = @VisitID)
+                    UPDATE VisitResults 
+                    SET Symptoms = @Symptoms, Recommendations = @Recommendations 
+                    WHERE VisitID = @VisitID
+                ELSE
+                    INSERT INTO VisitResults (VisitID, Symptoms, Recommendations) 
+                    VALUES (@VisitID, @Symptoms, @Recommendations)";
+
+                    using (var cmdResults = new Microsoft.Data.SqlClient.SqlCommand(sqlResults, polaczenie))
+                    {
+                        cmdResults.Parameters.AddWithValue("@VisitID", wizyta.IdWizyty);
+                        cmdResults.Parameters.AddWithValue("@Symptoms", (object)wizyta.Schorzenia ?? DBNull.Value);
+                        cmdResults.Parameters.AddWithValue("@Recommendations", (object)wizyta.Zalecenia ?? DBNull.Value);
+                        cmdResults.ExecuteNonQuery();
+                    }
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Błąd zapisu do bazy: " + ex.Message);
+                return false;
+            }
         }
     }
 }
