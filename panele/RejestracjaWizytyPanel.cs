@@ -106,8 +106,15 @@ namespace Przychodnia.panele
             }
             else
             {
-                // Obsługa wyjątków biznesowych (E1, E2, E3) bezpośrednio zwracanych przez bazę danych [cite: 2]
+                // Wyświetlenie komunikatu błędu z bazy danych
                 MessageBox.Show(wynik.Komunikat, "Błąd walidacji", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                // E3: Wymuszenie zmiany gabinetu w UI
+                if (wynik.Komunikat == "Wybrany gabinet jest przypisany do innej wizyty w tym czasie.")
+                {
+                    combobox_gabinet.SelectedIndex = -1; // Czyszczenie błędnego wyboru
+                    combobox_gabinet.Focus();            // Przeniesienie kursora z powrotem na gabinet
+                }
             }
         }
     }

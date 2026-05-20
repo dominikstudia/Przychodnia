@@ -701,27 +701,37 @@ namespace Przychodnia
                         roomId = Convert.ToInt32(res);
                     }
 
-                    // --- KROK 4: E2 - Walidacja konfliktu terminów lekarza ---
-                    string sqlCheckDoctor = "SELECT COUNT(1) FROM Visits WHERE DoctorID = @DocID AND VisitDateTime = @VTime AND Status != 'Anulowana'";
+                    // --- KROK 4: E2 - Walidacja konfliktu terminów lekarza (wizyta trwa 30 min) ---
+                    string sqlCheckDoctor = @"
+                        SELECT COUNT(1) FROM Visits 
+                        WHERE DoctorID = @DocID AND Status != 'Anulowana'
+                        AND VisitDateTime < DATEADD(minute, 30, @VTime) 
+                        AND DATEADD(minute, 30, VisitDateTime) > @VTime";
+
                     using (var cmdCheckDoc = new Microsoft.Data.SqlClient.SqlCommand(sqlCheckDoctor, polaczenie))
                     {
                         cmdCheckDoc.Parameters.AddWithValue("@DocID", doctorId);
                         cmdCheckDoc.Parameters.AddWithValue("@VTime", dataGodzinaWizyty);
                         if (Convert.ToInt32(cmdCheckDoc.ExecuteScalar()) > 0)
                         {
-                            return (false, "Lekarz jest niedostępny w wybranym terminie. Wybierz inną godzinę."); // Zgodnie z E2
+                            return (false, "Lekarz jest niedostępny w wybranym terminie. Wybierz inną godzinę.");
                         }
                     }
 
-                    // --- KROK 5: E3 - Walidacja konfliktu gabinetu ---
-                    string sqlCheckRoom = "SELECT COUNT(1) FROM Visits WHERE RoomID = @RoomID AND VisitDateTime = @VTime AND Status != 'Anulowana'";
+                    // --- KROK 5: E3 - Walidacja konfliktu gabinetu (wizyta trwa 30 min) ---
+                    string sqlCheckRoom = @"
+                        SELECT COUNT(1) FROM Visits 
+                        WHERE RoomID = @RoomID AND Status != 'Anulowana'
+                        AND VisitDateTime < DATEADD(minute, 30, @VTime) 
+                        AND DATEADD(minute, 30, VisitDateTime) > @VTime";
+
                     using (var cmdCheckRoom = new Microsoft.Data.SqlClient.SqlCommand(sqlCheckRoom, polaczenie))
                     {
                         cmdCheckRoom.Parameters.AddWithValue("@RoomID", roomId);
                         cmdCheckRoom.Parameters.AddWithValue("@VTime", dataGodzinaWizyty);
                         if (Convert.ToInt32(cmdCheckRoom.ExecuteScalar()) > 0)
                         {
-                            return (false, "Wybrany gabinet jest przypisany do innej wizyty w tym czasie."); // Zgodnie z E3 (wymuszenie zmiany)
+                            return (false, "Wybrany gabinet jest przypisany do innej wizyty w tym czasie.");
                         }
                     }
 
