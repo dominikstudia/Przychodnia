@@ -52,6 +52,7 @@ namespace Przychodnia
                 btn_dodaj.Visible = true;
                 btn_edytuj.Visible = true;
                 checkedlistbox_filtr_roli.Visible = true;
+                przycisk_zarejestruj_wizyte.Visible = false;
             }
             else if (czyRecepcja)
             {
