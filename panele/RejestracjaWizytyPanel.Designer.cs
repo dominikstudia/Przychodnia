@@ -41,7 +41,7 @@
             // combobox_specjalizacja
             // 
             combobox_specjalizacja.FormattingEnabled = true;
-            combobox_specjalizacja.Location = new Point(140, 105);
+            combobox_specjalizacja.Location = new Point(88, 90);
             combobox_specjalizacja.Name = "combobox_specjalizacja";
             combobox_specjalizacja.Size = new Size(121, 23);
             combobox_specjalizacja.TabIndex = 0;
@@ -49,14 +49,14 @@
             // combobox_lekarz
             // 
             combobox_lekarz.FormattingEnabled = true;
-            combobox_lekarz.Location = new Point(338, 105);
+            combobox_lekarz.Location = new Point(237, 90);
             combobox_lekarz.Name = "combobox_lekarz";
             combobox_lekarz.Size = new Size(121, 23);
             combobox_lekarz.TabIndex = 1;
             // 
             // datepicker_data_wizyty
             // 
-            datepicker_data_wizyty.Location = new Point(140, 181);
+            datepicker_data_wizyty.Location = new Point(24, 181);
             datepicker_data_wizyty.Name = "datepicker_data_wizyty";
             datepicker_data_wizyty.Size = new Size(200, 23);
             datepicker_data_wizyty.TabIndex = 2;
@@ -64,14 +64,14 @@
             // combobox_gabinet
             // 
             combobox_gabinet.FormattingEnabled = true;
-            combobox_gabinet.Location = new Point(391, 181);
+            combobox_gabinet.Location = new Point(239, 181);
             combobox_gabinet.Name = "combobox_gabinet";
             combobox_gabinet.Size = new Size(121, 23);
             combobox_gabinet.TabIndex = 3;
             // 
             // btn_zapisz_wizyte
             // 
-            btn_zapisz_wizyte.Location = new Point(326, 275);
+            btn_zapisz_wizyte.Location = new Point(179, 249);
             btn_zapisz_wizyte.Name = "btn_zapisz_wizyte";
             btn_zapisz_wizyte.Size = new Size(84, 23);
             btn_zapisz_wizyte.TabIndex = 4;
@@ -81,7 +81,7 @@
             // Specjalizacja
             // 
             Specjalizacja.AutoSize = true;
-            Specjalizacja.Location = new Point(144, 70);
+            Specjalizacja.Location = new Point(106, 57);
             Specjalizacja.Name = "Specjalizacja";
             Specjalizacja.Size = new Size(73, 15);
             Specjalizacja.TabIndex = 5;
@@ -90,7 +90,7 @@
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(340, 75);
+            label1.Location = new Point(276, 57);
             label1.Name = "label1";
             label1.Size = new Size(40, 15);
             label1.TabIndex = 6;
@@ -99,7 +99,7 @@
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(392, 154);
+            label2.Location = new Point(268, 153);
             label2.Name = "label2";
             label2.Size = new Size(48, 15);
             label2.TabIndex = 7;

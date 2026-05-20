@@ -110,7 +110,7 @@
             // 
             // przycisk_zarejestruj_wizyte
             // 
-            przycisk_zarejestruj_wizyte.Location = new Point(743, 14);
+            przycisk_zarejestruj_wizyte.Location = new Point(221, 14);
             przycisk_zarejestruj_wizyte.Name = "przycisk_zarejestruj_wizyte";
             przycisk_zarejestruj_wizyte.Size = new Size(168, 54);
             przycisk_zarejestruj_wizyte.TabIndex = 4;
