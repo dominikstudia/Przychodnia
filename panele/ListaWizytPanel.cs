@@ -42,7 +42,7 @@ namespace Przychodnia.panele
 
         private void SkonfigurujDataGrid()
         {
-            datagridview_wizyty.Columns["PESEL"].Visible = false;
+            datagridview_wizyty.Columns["ID Wizyty"].Visible = false;
             datagridview_wizyty.Columns["Schorzenia"].Visible = false;
             datagridview_wizyty.Columns["Zalecenia"].Visible = false;
             datagridview_wizyty.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
