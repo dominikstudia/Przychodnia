@@ -41,6 +41,7 @@ namespace Przychodnia
             przycisk_dodaj_pacjenta.Visible = czyRecepcjonista;
             przycisk_wyszukaj_uzytkownika.Visible = (czyAdmin || czyRecepcjonista);
             przycisk_lista_wizyt.Visible = (czyLekarz || czyRecepcjonista);
+            przycisk_specjalizacja.Visible = czyAdmin;
 
             przycisk_wyszukaj_uzytkownika.Text = czyAdmin ? "Lista użytkowników" : "Wyszukaj pacjenta";
         }
@@ -113,6 +114,17 @@ namespace Przychodnia
             panel_edycji.Controls.Add(formularz);
 
             label_ogolny.Text = "Przegląd wizyt pacjentów";
+        }
+
+        private void przycisk_specjalizacja_Click(object sender, EventArgs e)
+        {
+            panel_edycji.Controls.Clear();
+
+            Specjalizacje formularz = new Specjalizacje();
+            formularz.Dock = DockStyle.Fill;
+            panel_edycji.Controls.Add(formularz);
+
+            label_ogolny.Text = "Przypisywanie specjalizacji";
         }
     }
 }

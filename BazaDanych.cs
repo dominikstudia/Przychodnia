@@ -947,5 +947,107 @@ namespace Przychodnia
                 return false;
             }
         }
+        // Prosta klasa do trzymania ID i Nazwy specjalizacji dla ComboBoxa
+        public class Specjalizacja
+        {
+            public int Id { get; set; }
+            public string Nazwa { get; set; }
+
+            // Nadpisanie ToString() sprawia, że ComboBox domyślnie wyświetla tę wartość
+            public override string ToString()
+            {
+                return Nazwa;
+            }
+        }
+
+        /// <summary>
+        /// Pobiera listę specjalizacji wraz z ich identyfikatorami.
+        /// </summary>
+        public static List<Specjalizacja> PobierzWszystkieSpecjalizacjeZId()
+        {
+            List<Specjalizacja> lista = new List<Specjalizacja>();
+            try
+            {
+                using (var polaczenie = new Microsoft.Data.SqlClient.SqlConnection(POLACZENIE_STRING))
+                {
+                    polaczenie.Open();
+                    string sql = "SELECT SpecializationID, Name FROM Specializations ORDER BY Name ASC";
+
+                    using (var cmd = new Microsoft.Data.SqlClient.SqlCommand(sql, polaczenie))
+                    using (var czytnik = cmd.ExecuteReader())
+                    {
+                        while (czytnik.Read())
+                        {
+                            lista.Add(new Specjalizacja
+                            {
+                                Id = Convert.ToInt32(czytnik["SpecializationID"]),
+                                Nazwa = czytnik["Name"].ToString() ?? ""
+                            });
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Błąd pobierania specjalizacji: " + ex.Message, "Błąd", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            return lista;
+        }
+
+        /// <summary>
+        /// Przypisuje lub aktualizuje specjalizację dla danego lekarza w tabeli Doctors.
+        /// </summary>
+        public static bool PrzypiszSpecjalizacjeLekarzowi(int userId, int specializationId)
+        {
+            try
+            {
+                using (var polaczenie = new Microsoft.Data.SqlClient.SqlConnection(POLACZENIE_STRING))
+                {
+                    polaczenie.Open();
+
+                    // Krok 1: Sprawdzamy, czy ten użytkownik figuruje już w tabeli Doctors
+                    string checkSql = "SELECT DoctorID FROM Doctors WHERE UserID = @UID";
+                    int? doctorId = null;
+
+                    using (var checkCmd = new Microsoft.Data.SqlClient.SqlCommand(checkSql, polaczenie))
+                    {
+                        checkCmd.Parameters.AddWithValue("@UID", userId);
+                        var result = checkCmd.ExecuteScalar();
+                        if (result != null)
+                        {
+                            doctorId = Convert.ToInt32(result);
+                        }
+                    }
+
+                    // Krok 2: Jeśli istnieje - robimy UPDATE, jeśli nie - robimy INSERT
+                    if (doctorId.HasValue)
+                    {
+                        string updateSql = "UPDATE Doctors SET SpecializationID = @SpecID WHERE DoctorID = @DocID";
+                        using (var updateCmd = new Microsoft.Data.SqlClient.SqlCommand(updateSql, polaczenie))
+                        {
+                            updateCmd.Parameters.AddWithValue("@SpecID", specializationId);
+                            updateCmd.Parameters.AddWithValue("@DocID", doctorId.Value);
+                            updateCmd.ExecuteNonQuery();
+                        }
+                    }
+                    else
+                    {
+                        string insertSql = "INSERT INTO Doctors (UserID, SpecializationID) VALUES (@UID, @SpecID)";
+                        using (var insertCmd = new Microsoft.Data.SqlClient.SqlCommand(insertSql, polaczenie))
+                        {
+                            insertCmd.Parameters.AddWithValue("@UID", userId);
+                            insertCmd.Parameters.AddWithValue("@SpecID", specializationId);
+                            insertCmd.ExecuteNonQuery();
+                        }
+                    }
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Błąd podczas przypisywania specjalizacji: " + ex.Message, "Błąd", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+        }
     }
 }

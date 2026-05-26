@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             panel_boczny = new Panel();
+            przycisk_specjalizacja = new Button();
             przycisk_lista_wizyt = new Button();
             przycisk_dodaj_pacjenta = new Button();
             btn_zmien_haslo = new Button();
@@ -46,6 +47,7 @@
             // panel_boczny
             // 
             panel_boczny.BackColor = SystemColors.ControlDark;
+            panel_boczny.Controls.Add(przycisk_specjalizacja);
             panel_boczny.Controls.Add(przycisk_lista_wizyt);
             panel_boczny.Controls.Add(przycisk_dodaj_pacjenta);
             panel_boczny.Controls.Add(btn_zmien_haslo);
@@ -58,6 +60,16 @@
             panel_boczny.Name = "panel_boczny";
             panel_boczny.Size = new Size(200, 581);
             panel_boczny.TabIndex = 0;
+            // 
+            // przycisk_specjalizacja
+            // 
+            przycisk_specjalizacja.Location = new Point(0, 375);
+            przycisk_specjalizacja.Name = "przycisk_specjalizacja";
+            przycisk_specjalizacja.Size = new Size(200, 70);
+            przycisk_specjalizacja.TabIndex = 7;
+            przycisk_specjalizacja.Text = "Specjalizacje";
+            przycisk_specjalizacja.UseVisualStyleBackColor = true;
+            przycisk_specjalizacja.Click += przycisk_specjalizacja_Click;
             // 
             // przycisk_lista_wizyt
             // 
@@ -73,7 +85,7 @@
             // 
             // przycisk_dodaj_pacjenta
             // 
-            przycisk_dodaj_pacjenta.Location = new Point(0, 286);
+            przycisk_dodaj_pacjenta.Location = new Point(0, 277);
             przycisk_dodaj_pacjenta.Name = "przycisk_dodaj_pacjenta";
             przycisk_dodaj_pacjenta.Size = new Size(200, 70);
             przycisk_dodaj_pacjenta.TabIndex = 5;
@@ -198,5 +210,6 @@
         private Button btn_zmien_haslo;
         private Button przycisk_dodaj_pacjenta;
         private Button przycisk_lista_wizyt;
+        private Button przycisk_specjalizacja;
     }
 }
