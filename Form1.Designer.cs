@@ -73,7 +73,7 @@
             // 
             // przycisk_dodaj_pacjenta
             // 
-            przycisk_dodaj_pacjenta.Location = new Point(0, 70);
+            przycisk_dodaj_pacjenta.Location = new Point(0, 286);
             przycisk_dodaj_pacjenta.Name = "przycisk_dodaj_pacjenta";
             przycisk_dodaj_pacjenta.Size = new Size(200, 70);
             przycisk_dodaj_pacjenta.TabIndex = 5;

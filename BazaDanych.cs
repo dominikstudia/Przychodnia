@@ -12,7 +12,7 @@ namespace Przychodnia
 {
     internal class BazaDanych
     {
-        public static readonly string POLACZENIE_STRING = @"Server=KAKUR\SQLEXPRESS01;Database=Przychodnia;Trusted_Connection=True;TrustServerCertificate=True;";
+        public static readonly string POLACZENIE_STRING = @"Server=(localdb)\local;Database=Przychodnia;Trusted_Connection=True;TrustServerCertificate=True;";
 
         public static BindingList<Uzytkownik> Uzytkownicy { get; set; } = new BindingList<Uzytkownik>();
         public static Uzytkownik? ZALOGOWANY_UZYTKOWNIK { get; set; } = null;
@@ -276,19 +276,35 @@ namespace Przychodnia
 
         public static bool ZaarchiwizujUzytkownika(Uzytkownik wybrany)
         {
+            // Kopia zapasowa na wypadek błędu bazy (żeby interfejs nie zgłupiał)
+            string stareImie = wybrany.Imiona;
+            string stareNazwisko = wybrany.Nazwisko;
+
             wybrany.Imiona = "Zarchiwizowane";
             wybrany.Nazwisko = "Dane";
             wybrany.Email = $"brak_{wybrany.Id}@danych.pl";
             wybrany.Pesel = wybrany.Id.ToString().PadLeft(11, '0');
-            wybrany.Telefon = "";
-            wybrany.Miejscowosc = "";
-            wybrany.Ulica = "";
-            wybrany.KodPocztowy = "";
-            wybrany.NumerPosesji = "";
-            wybrany.NumerLokalu = "";
+
+            // Zamiast "", użyj bezpiecznych "wypełniaczy", które przejdą przez wymogi SQL
+            wybrany.Telefon = "000000000";
+            wybrany.Miejscowosc = "Brak";
+            wybrany.Ulica = "Brak";
+            wybrany.KodPocztowy = "00-000";
+            wybrany.NumerPosesji = "0";
+            wybrany.NumerLokalu = "0";
             wybrany.CzyZarchiwizowany = true;
 
-            return DodajLubZaaktualizujUzytkownika(wybrany);
+            bool sukces = DodajLubZaaktualizujUzytkownika(wybrany);
+
+            // Jeśli zapis do bazy nie powiódł się, cofamy zmiany, żeby interfejs wyświetlał prawdę
+            if (!sukces)
+            {
+                wybrany.Imiona = stareImie;
+                wybrany.Nazwisko = stareNazwisko;
+                wybrany.CzyZarchiwizowany = false;
+            }
+
+            return sukces;
         }
 
         public static void MasowoNadajRole(List<Uzytkownik> zaznaczeni, int id)
