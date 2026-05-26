@@ -53,13 +53,17 @@ namespace Przychodnia
                 btn_edytuj.Visible = true;
                 checkedlistbox_filtr_roli.Visible = true;
                 przycisk_zarejestruj_wizyte.Visible = false;
+                btn_edytuj_pacjenta.Visible = false;
+                btn_dodaj_pacjenta.Visible = false;
             }
             else if (czyRecepcja)
             {
-                btn_edytuj.Visible = true;
+                przycisk_zarejestruj_wizyte.Visible = true;
+                btn_edytuj_pacjenta.Visible = true;
+                btn_dodaj_pacjenta.Visible = true;
+                btn_edytuj.Visible = false;
                 btn_archiwizuj.Visible = false;
                 btn_dodaj.Visible = false;
-                przycisk_zarejestruj_wizyte.Visible = true;
 
                 // Ukrywamy listę, ale zaznaczamy w niej Pacjentów (ID 4)
                 checkedlistbox_filtr_roli.Visible = false;
@@ -225,7 +229,7 @@ namespace Przychodnia
             // 2. Pobieramy obiekt użytkownika
             if (datagrid_uzytkownicy.SelectedRows[0].DataBoundItem is not Uzytkownik wybranyPacjent) return;
 
-            // 3. Zabezpieczenie: czy to na pewno pacjent? (Zakładając, że rola 4 to Pacjent)
+            // 3. Zabezpieczenie: czy to na pewno pacjent (Zakładając, że rola 4 to Pacjent)
             if (!wybranyPacjent.IdRol.Contains(4))
             {
                 MessageBox.Show("Wizytę można zaplanować wyłącznie dla pacjenta.", "Niedozwolona operacja", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -244,6 +248,62 @@ namespace Przychodnia
 
             oknoRejestracji.Controls.Add(panel);
             oknoRejestracji.ShowDialog();
+        }
+
+        // --- Przycisk DODAJ PACJENTA ---
+        private void btn_dodaj_pacjenta_Click(object sender, EventArgs e)
+        {
+            Form oknoRejestracji = new Form();
+            oknoRejestracji.Text = "Rejestracja nowego pacjenta";
+            oknoRejestracji.StartPosition = FormStartPosition.CenterScreen;
+            oknoRejestracji.FormBorderStyle = FormBorderStyle.FixedDialog;
+            oknoRejestracji.MaximizeBox = false;
+            oknoRejestracji.MinimizeBox = false;
+
+            var panelDodawania = new Przychodnia.DodajPacjentaPanel();
+
+            oknoRejestracji.ClientSize = panelDodawania.Size;
+
+            panelDodawania.Dock = DockStyle.Fill;
+            oknoRejestracji.Controls.Add(panelDodawania);
+            oknoRejestracji.ShowDialog();
+
+            btn_szukaj_Click(null, null);
+        }
+
+        // --- Przycisk EDYTUJ PACJENTA ---
+        private void btn_edytuj_pacjenta_Click(object sender, EventArgs e)
+        {
+            if (datagrid_uzytkownicy.SelectedRows.Count == 0)
+            {
+                MessageBox.Show("Proszę najpierw wybrać pacjenta z listy.", "Brak wyboru", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            if (datagrid_uzytkownicy.SelectedRows[0].DataBoundItem is not Uzytkownik wybranyPacjent) return;
+
+            if (!wybranyPacjent.IdRol.Contains(4))
+            {
+                MessageBox.Show("Edycja z tego poziomu dotyczy wyłącznie danych pacjentów.", "Niedozwolona operacja", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            Form oknoEdycji = new Form();
+            oknoEdycji.Text = $"Edycja danych pacjenta: {wybranyPacjent.Imiona} {wybranyPacjent.Nazwisko}";
+            oknoEdycji.StartPosition = FormStartPosition.CenterScreen;
+            oknoEdycji.FormBorderStyle = FormBorderStyle.FixedDialog;
+            oknoEdycji.MaximizeBox = false;
+            oknoEdycji.MinimizeBox = false;
+
+            var panelEdycji = new Przychodnia.EdycjaPacjentaPanel(wybranyPacjent);
+
+            oknoEdycji.ClientSize = panelEdycji.Size;
+
+            panelEdycji.Dock = DockStyle.Fill;
+            oknoEdycji.Controls.Add(panelEdycji);
+            oknoEdycji.ShowDialog();
+
+            btn_szukaj_Click(null, null);
         }
     }
 }

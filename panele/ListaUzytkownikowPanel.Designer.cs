@@ -34,12 +34,14 @@
             btn_szukaj = new Button();
             textbox_wyszukiwanie = new TextBox();
             panel2 = new Panel();
+            btn_dodaj_pacjenta = new Button();
             przycisk_zarejestruj_wizyte = new Button();
             btn_edytuj = new Button();
             btn_podglad_szczegolow = new Button();
             btn_archiwizuj = new Button();
             btn_dodaj = new Button();
             datagrid_uzytkownicy = new DataGridView();
+            btn_edytuj_pacjenta = new Button();
             panel1.SuspendLayout();
             panel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)datagrid_uzytkownicy).BeginInit();
@@ -97,6 +99,8 @@
             // 
             // panel2
             // 
+            panel2.Controls.Add(btn_edytuj_pacjenta);
+            panel2.Controls.Add(btn_dodaj_pacjenta);
             panel2.Controls.Add(przycisk_zarejestruj_wizyte);
             panel2.Controls.Add(btn_edytuj);
             panel2.Controls.Add(btn_podglad_szczegolow);
@@ -107,6 +111,16 @@
             panel2.Name = "panel2";
             panel2.Size = new Size(941, 81);
             panel2.TabIndex = 1;
+            // 
+            // btn_dodaj_pacjenta
+            // 
+            btn_dodaj_pacjenta.Location = new Point(47, 14);
+            btn_dodaj_pacjenta.Name = "btn_dodaj_pacjenta";
+            btn_dodaj_pacjenta.Size = new Size(168, 54);
+            btn_dodaj_pacjenta.TabIndex = 5;
+            btn_dodaj_pacjenta.Text = "Dodaj pacjenta";
+            btn_dodaj_pacjenta.UseVisualStyleBackColor = true;
+            btn_dodaj_pacjenta.Click += btn_dodaj_pacjenta_Click;
             // 
             // przycisk_zarejestruj_wizyte
             // 
@@ -120,7 +134,7 @@
             // 
             // btn_edytuj
             // 
-            btn_edytuj.Location = new Point(396, 14);
+            btn_edytuj.Location = new Point(395, 14);
             btn_edytuj.Name = "btn_edytuj";
             btn_edytuj.Size = new Size(168, 54);
             btn_edytuj.TabIndex = 3;
@@ -179,6 +193,17 @@
             datagrid_uzytkownicy.Size = new Size(941, 312);
             datagrid_uzytkownicy.TabIndex = 2;
             // 
+            // btn_edytuj_pacjenta
+            // 
+            btn_edytuj_pacjenta.Location = new Point(395, 14);
+            btn_edytuj_pacjenta.Name = "btn_edytuj_pacjenta";
+            btn_edytuj_pacjenta.Size = new Size(168, 54);
+            btn_edytuj_pacjenta.TabIndex = 6;
+            btn_edytuj_pacjenta.Text = "Edytuj pacjenta";
+            btn_edytuj_pacjenta.UseVisualStyleBackColor = true;
+            btn_edytuj_pacjenta.Visible = false;
+            btn_edytuj_pacjenta.Click += btn_edytuj_pacjenta_Click;
+            // 
             // ListaUzytkownikowPanel
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -209,5 +234,7 @@
         private DataGridView datagrid_uzytkownicy;
         private CheckedListBox checkedlistbox_filtr_roli;
         private Button przycisk_zarejestruj_wizyte;
+        private Button btn_dodaj_pacjenta;
+        private Button btn_edytuj_pacjenta;
     }
 }

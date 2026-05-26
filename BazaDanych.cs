@@ -885,5 +885,51 @@ namespace Przychodnia
                 return false;
             }
         }
+
+        public static bool AktualizujDanePacjenta(Uzytkownik pacjent)
+        {
+            try
+            {
+                using (var polaczenie = new Microsoft.Data.SqlClient.SqlConnection(POLACZENIE_STRING))
+                {
+                    polaczenie.Open();
+
+                    // Aktualizacja tylko danych demograficznych i adresowych pacjenta (bez ról i hasła)
+                    string sql = @"UPDATE Users 
+                           SET FirstName=@FN, LastName=@LN, Email=@Em, Phone=@Ph, 
+                               PESEL=@Pesel, BirthDate=@BD, Gender=@Gen, City=@City, 
+                               Street=@Street, PostalCode=@Postal, HouseNumber=@HN, ApartmentNumber=@AN 
+                           WHERE UserID=@Id";
+
+                    using (var cmd = new Microsoft.Data.SqlClient.SqlCommand(sql, polaczenie))
+                    {
+                        cmd.Parameters.AddWithValue("@Id", pacjent.Id);
+                        cmd.Parameters.AddWithValue("@FN", pacjent.Imiona ?? "");
+                        cmd.Parameters.AddWithValue("@LN", pacjent.Nazwisko ?? "");
+                        cmd.Parameters.AddWithValue("@Em", string.IsNullOrEmpty(pacjent.Email) ? DBNull.Value : (object)pacjent.Email);
+                        cmd.Parameters.AddWithValue("@Ph", pacjent.Telefon ?? "");
+                        cmd.Parameters.AddWithValue("@Pesel", pacjent.Pesel ?? "");
+                        cmd.Parameters.AddWithValue("@BD", pacjent.DataUrodzenia);
+                        cmd.Parameters.AddWithValue("@Gen", pacjent.CzyMezczyzna ? 1 : 0);
+                        cmd.Parameters.AddWithValue("@City", pacjent.Miejscowosc ?? "");
+                        cmd.Parameters.AddWithValue("@Postal", pacjent.KodPocztowy ?? "");
+                        cmd.Parameters.AddWithValue("@Street", string.IsNullOrEmpty(pacjent.Ulica) ? DBNull.Value : (object)pacjent.Ulica);
+                        cmd.Parameters.AddWithValue("@HN", pacjent.NumerPosesji ?? "");
+                        cmd.Parameters.AddWithValue("@AN", string.IsNullOrEmpty(pacjent.NumerLokalu) ? DBNull.Value : (object)pacjent.NumerLokalu);
+
+                        cmd.ExecuteNonQuery();
+                    }
+
+                    // Odświeżenie listy użytkowników w pamięci aplikacji, żeby tabela od razu pokazała nowe dane
+                    ZaladujBazeDanych();
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Błąd zapisu do bazy podczas edycji pacjenta: " + ex.Message, "Błąd", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+        }
     }
 }
