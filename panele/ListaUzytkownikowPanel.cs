@@ -38,10 +38,8 @@ namespace Przychodnia
                 checkedlistbox_filtr_roli.Items.Add(rola);
             }
 
-            // 2. Sprawdzamy uprawnienia zalogowanego użytkownika
-            Uzytkownik zalogowany = BazaDanych.ZALOGOWANY_UZYTKOWNIK;
-            bool czyAdmin = zalogowany != null && zalogowany.IdRol.Contains(1);
-            bool czyRecepcja = zalogowany != null && zalogowany.IdRol.Contains(3);
+            bool czyAdmin = Role.SprawdzCzyMaRole(BazaDanych.ZALOGOWANY_UZYTKOWNIK, Role.ADMINISTRATOR);
+            bool czyRecepcja = Role.SprawdzCzyMaRole(BazaDanych.ZALOGOWANY_UZYTKOWNIK, Role.RECEPCJONISTA);
 
             checkbox_uwzglednienie_zarchwizowanych.Checked = true;
 
@@ -119,9 +117,8 @@ namespace Przychodnia
             }
 
             // 1. Sprawdzamy, kto jest zalogowany
-            Uzytkownik zalogowany = BazaDanych.ZALOGOWANY_UZYTKOWNIK;
-            bool czyAdmin = zalogowany != null && zalogowany.IdRol.Contains(1);
-            bool czyRecepcja = zalogowany != null && zalogowany.IdRol.Contains(3) && !czyAdmin;
+            bool czyAdmin = Role.SprawdzCzyMaRole(BazaDanych.ZALOGOWANY_UZYTKOWNIK, Role.ADMINISTRATOR);
+            bool czyRecepcja = Role.SprawdzCzyMaRole(BazaDanych.ZALOGOWANY_UZYTKOWNIK, Role.RECEPCJONISTA) && !czyAdmin;
 
             // 2. Rozbijamy szukaną frazę na słowa (żeby zadziałało np. "Adam Nowak" albo "Łódź Piotrkowska")
             var slowaKluczowe = szukanaFraza.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
@@ -135,8 +132,8 @@ namespace Przychodnia
             // 4. Nakładanie filtra ról w zależności od tego, kto używa systemu
             if (czyRecepcja)
             {
-                // Jeśli to recepcja, "na twardo" wywalamy z wyników każdego, kto nie ma roli Pacjent
-                przefiltrowani = przefiltrowani.Where(u => u.IdRol.Contains(4)).ToList();
+                int idRoliPacjenta = Role.ZdobadzIdRoli(Role.PACJENT);
+                przefiltrowani = przefiltrowani.Where(u => u.IdRol.Contains(idRoliPacjenta)).ToList();
             }
             else if (czyAdmin && wybraneRoleIds.Count > 0)
             {
@@ -231,8 +228,7 @@ namespace Przychodnia
             // 2. Pobieramy obiekt użytkownika
             if (datagrid_uzytkownicy.SelectedRows[0].DataBoundItem is not Uzytkownik wybranyPacjent) return;
 
-            // 3. Zabezpieczenie: czy to na pewno pacjent (Zakładając, że rola 4 to Pacjent)
-            if (!wybranyPacjent.IdRol.Contains(4))
+            if (!wybranyPacjent.IdRol.Contains(Role.ZdobadzIdRoli(Role.PACJENT)))
             {
                 MessageBox.Show("Wizytę można zaplanować wyłącznie dla pacjenta.", "Niedozwolona operacja", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
@@ -284,7 +280,7 @@ namespace Przychodnia
 
             if (datagrid_uzytkownicy.SelectedRows[0].DataBoundItem is not Uzytkownik wybranyPacjent) return;
 
-            if (!wybranyPacjent.IdRol.Contains(4))
+            if (!wybranyPacjent.IdRol.Contains(Role.ZdobadzIdRoli(Role.PACJENT)))
             {
                 MessageBox.Show("Edycja z tego poziomu dotyczy wyłącznie danych pacjentów.", "Niedozwolona operacja", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;

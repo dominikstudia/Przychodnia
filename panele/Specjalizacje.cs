@@ -25,10 +25,9 @@ namespace Przychodnia.panele
 
         private void ZaladujDaneDoFormularza()
         {
-            // 1. Ładowanie lekarzy (zakładamy, że rola Lekarza to ID = 2)
-            // Używamy BazaDanych.Uzytkownicy, która jest już w pamięci
+            int idRoliLekarz = Role.ZdobadzIdRoli(Role.LEKARZ);
             var listaLekarzy = BazaDanych.Uzytkownicy
-                .Where(u => u.IdRol.Contains(2) && !u.CzyZarchiwizowany)
+                .Where(u => u.IdRol.Contains(idRoliLekarz) && !u.CzyZarchiwizowany)
                 .ToList();
 
             cmbLekarze.DataSource = listaLekarzy;

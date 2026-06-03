@@ -22,6 +22,8 @@ namespace Przychodnia
             formularz.Dock = DockStyle.Fill;
             panel_edycji.Controls.Add(formularz);
             label_ogolny.Text = "Logowanie do systemu";
+
+            Role.ZaladujRole(BazaDanych.PobierzWszystkieRole());
         }
 
         public void OdblokujSystemPoZalogowaniu()
@@ -32,9 +34,9 @@ namespace Przychodnia
 
             label_ogolny.Text = "PRZYCHODNIA";
 
-            bool czyAdmin = BazaDanych.ZALOGOWANY_UZYTKOWNIK.IdRol.Contains(1);
-            bool czyRecepcjonista = BazaDanych.ZALOGOWANY_UZYTKOWNIK.IdRol.Contains(3);
-            bool czyLekarz = BazaDanych.ZALOGOWANY_UZYTKOWNIK.IdRol.Contains(2);
+            bool czyAdmin = Role.SprawdzCzyMaRole(BazaDanych.ZALOGOWANY_UZYTKOWNIK, Role.ADMINISTRATOR);
+            bool czyRecepcjonista = Role.SprawdzCzyMaRole(BazaDanych.ZALOGOWANY_UZYTKOWNIK, Role.RECEPCJONISTA);
+            bool czyLekarz = Role.SprawdzCzyMaRole(BazaDanych.ZALOGOWANY_UZYTKOWNIK, Role.LEKARZ);
 
             przycisk_dodaj_uzytkownika.Visible = czyAdmin;
             przycisk_przeglad_uprawnien.Visible = czyAdmin;

@@ -727,7 +727,7 @@ namespace Przychodnia
                 JOIN Rooms r ON v.RoomID = r.RoomID
                 LEFT JOIN VisitResults vr ON v.VisitID = vr.VisitID";
 
-                    if (zalogowanyUzytkownik.IdRol.Contains(2))
+                    if (Role.SprawdzCzyMaRole(zalogowanyUzytkownik, Role.LEKARZ))
                     {
                         sql += " WHERE u_doc.UserID = @LekarzUserID";
                     }
@@ -736,7 +736,7 @@ namespace Przychodnia
 
                     using (var cmd = new Microsoft.Data.SqlClient.SqlCommand(sql, polaczenie))
                     {
-                        if (zalogowanyUzytkownik.IdRol.Contains(2))
+                        if (Role.SprawdzCzyMaRole(zalogowanyUzytkownik, Role.LEKARZ))
                         {
                             cmd.Parameters.AddWithValue("@LekarzUserID", zalogowanyUzytkownik.Id);
                         }

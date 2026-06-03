@@ -21,9 +21,9 @@ namespace Przychodnia.panele
         private void ListaWizytPanel_Load(object sender, EventArgs e)
         {
 
-            bool czyAdmin = BazaDanych.ZALOGOWANY_UZYTKOWNIK.IdRol.Contains(1);
-            bool czyRecepcjonista = BazaDanych.ZALOGOWANY_UZYTKOWNIK.IdRol.Contains(3);
-            bool czyLekarz = BazaDanych.ZALOGOWANY_UZYTKOWNIK.IdRol.Contains(2);
+            bool czyAdmin = Role.SprawdzCzyMaRole(BazaDanych.ZALOGOWANY_UZYTKOWNIK, Role.ADMINISTRATOR);
+            bool czyRecepcjonista = Role.SprawdzCzyMaRole(BazaDanych.ZALOGOWANY_UZYTKOWNIK, Role.RECEPCJONISTA);
+            bool czyLekarz = Role.SprawdzCzyMaRole(BazaDanych.ZALOGOWANY_UZYTKOWNIK, Role.LEKARZ);
 
             if (!czyAdmin && !czyRecepcjonista)
             {
@@ -59,8 +59,9 @@ namespace Przychodnia.panele
                 dtp_dataDo.Value = wszystkieDaty.Max().Date;
             }
 
+            int idRoliLekarz = Role.ZdobadzIdRoli(Role.LEKARZ);
             var wszyscyLekarze = BazaDanych.Uzytkownicy
-                .Where(u => u.IdRol.Contains(2) && !u.CzyZarchiwizowany)
+                .Where(u => u.IdRol.Contains(idRoliLekarz) && !u.CzyZarchiwizowany)
                 .Select(u => u.Imiona + " " + u.Nazwisko)
                 .OrderBy(nazwa => nazwa)
                 .ToArray();

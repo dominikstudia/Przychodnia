@@ -22,9 +22,8 @@ namespace Przychodnia
                 checkedlistbox_uprawnienia.Items.Add(rola);
             }
 
-            Uzytkownik zalogowany = BazaDanych.ZALOGOWANY_UZYTKOWNIK;
-            bool czyAdmin = zalogowany != null && zalogowany.IdRol.Contains(1);
-            bool czyRecepcja = zalogowany != null && zalogowany.IdRol.Contains(3);
+            bool czyAdmin = Role.SprawdzCzyMaRole(BazaDanych.ZALOGOWANY_UZYTKOWNIK, Role.ADMINISTRATOR);
+            bool czyRecepcja = Role.SprawdzCzyMaRole(BazaDanych.ZALOGOWANY_UZYTKOWNIK, Role.RECEPCJONISTA);
 
             // 1. Logika uprawnień do widoku ról
             if (!czyAdmin)
@@ -77,7 +76,7 @@ namespace Przychodnia
             else
             {
                 // Jeśli to EDYCJA, a zalogowana jest Recepcja, upewniamy się, że login i hasło są zablokowane
-                bool czyRecepcja = BazaDanych.ZALOGOWANY_UZYTKOWNIK != null && BazaDanych.ZALOGOWANY_UZYTKOWNIK.IdRol.Contains(3);
+                bool czyRecepcja = Role.SprawdzCzyMaRole(BazaDanych.ZALOGOWANY_UZYTKOWNIK, Role.RECEPCJONISTA);
                 if (czyRecepcja)
                 {
                     textbox_login.ReadOnly = true;
@@ -102,9 +101,8 @@ namespace Przychodnia
 
         private void btn_potwierdz_Click(object sender, EventArgs e)
         {
-            Uzytkownik zalogowany = BazaDanych.ZALOGOWANY_UZYTKOWNIK;
-            bool czyAdmin = zalogowany != null && zalogowany.IdRol.Contains(1);
-            bool czyRecepcja = zalogowany != null && zalogowany.IdRol.Contains(3);
+            bool czyAdmin = Role.SprawdzCzyMaRole(BazaDanych.ZALOGOWANY_UZYTKOWNIK, Role.ADMINISTRATOR);
+            bool czyRecepcja = Role.SprawdzCzyMaRole(BazaDanych.ZALOGOWANY_UZYTKOWNIK, Role.RECEPCJONISTA);
 
             // Walidacja pól wymaganych
             var wymaganePolaTekstowe = new Dictionary<Control, Label>()
