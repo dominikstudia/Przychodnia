@@ -258,7 +258,7 @@ namespace Przychodnia
             oknoRejestracji.MaximizeBox = false;
             oknoRejestracji.MinimizeBox = false;
 
-            var panelDodawania = new Przychodnia.DodajPacjentaPanel();
+            var panelDodawania = new Przychodnia.ZarzadzajPacjentemPanel();
 
             oknoRejestracji.ClientSize = panelDodawania.Size;
 
@@ -293,7 +293,7 @@ namespace Przychodnia
             oknoEdycji.MaximizeBox = false;
             oknoEdycji.MinimizeBox = false;
 
-            var panelEdycji = new Przychodnia.EdycjaPacjentaPanel(wybranyPacjent);
+            var panelEdycji = new ZarzadzajPacjentemPanel(wybranyPacjent);
 
             oknoEdycji.ClientSize = panelEdycji.Size;
 

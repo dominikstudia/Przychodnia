@@ -1,6 +1,6 @@
 ﻿namespace Przychodnia
 {
-    partial class DodajPacjentaPanel
+    partial class ZarzadzajPacjentemPanel
     {
         /// <summary> 
         /// Wymagana zmienna projektanta.

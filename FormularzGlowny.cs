@@ -100,7 +100,7 @@ namespace Przychodnia
         {
             panel_edycji.Controls.Clear();
 
-            DodajPacjentaPanel formularz = new DodajPacjentaPanel();
+            ZarzadzajPacjentemPanel formularz = new ZarzadzajPacjentemPanel();
             formularz.Dock = DockStyle.Fill;
             panel_edycji.Controls.Add(formularz);
 

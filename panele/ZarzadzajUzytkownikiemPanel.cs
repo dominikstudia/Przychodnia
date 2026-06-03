@@ -152,7 +152,7 @@ namespace Przychodnia
                 }
             }
 
-            var walidacjaPesel = Narzedzia.SprawdzPesel(textbox_pesel.Text, datetimerpicker_data_urodzenia.Value, combobox_plec.SelectedItem.ToString() == "Mężczyzna");
+            var walidacjaPesel = Narzedzia.SprawdzPesel(textbox_pesel.Text, datetimerpicker_data_urodzenia.Value, combobox_plec.SelectedItem.ToString() == "Mężczyzna", true);
             if (!walidacjaPesel.Poprawny)
             {
                 MessageBox.Show(walidacjaPesel.Komunikat, "Błąd", MessageBoxButtons.OK, MessageBoxIcon.Warning);

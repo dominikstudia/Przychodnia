@@ -5,7 +5,7 @@ namespace Przychodnia
 {
     public static class Narzedzia
     {
-        public static (bool Poprawny, string Komunikat) SprawdzPesel(string pesel, DateTime dataUrodzenia, bool czyMezczyzna)
+        public static (bool Poprawny, string Komunikat) SprawdzPesel(string pesel, DateTime dataUrodzenia, bool czyMezczyzna, bool czySprawdzicCzyIstnieje)
         {
             string blad = "Numer PESEL jest nieprawidłowy lub niezgodny z danymi";
 
@@ -29,10 +29,13 @@ namespace Przychodnia
 
             if (dataUrodzenia.Year != pelnyRok || dataUrodzenia.Month != miesiac || dataUrodzenia.Day != dzien) return (false, blad);
 
-            var uzytkownicy = BazaDanych.Uzytkownicy;
-            if (uzytkownicy != null && uzytkownicy.Any(u => u.Pesel == pesel))
+            if (czySprawdzicCzyIstnieje)
             {
-                return (false, "Taki numer PESEL istnieje juz w bazie danych.");
+                var uzytkownicy = BazaDanych.Uzytkownicy;
+                if (uzytkownicy != null && uzytkownicy.Any(u => u.Pesel == pesel))
+                {
+                    return (false, "Taki numer PESEL istnieje juz w bazie danych.");
+                }
             }
 
 

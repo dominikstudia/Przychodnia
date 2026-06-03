@@ -3,10 +3,13 @@ using System.Windows.Forms;
 
 namespace Przychodnia
 {
-    public partial class DodajPacjentaPanel : UserControl
+    public partial class ZarzadzajPacjentemPanel : UserControl
     {
-        public DodajPacjentaPanel()
+        private Uzytkownik _pacjent;
+        public ZarzadzajPacjentemPanel(Uzytkownik pacjent = null)
         {
+            _pacjent = pacjent;
+
             InitializeComponent();
 
             // Automatyczne podpięcie zabezpieczeń wpisywania znaków
@@ -17,7 +20,34 @@ namespace Przychodnia
             textbox_ulica.KeyPress += (s, e) => RegexPatterny.SprawdzCzyMoznaKliknacPrzycisk(RegexPatterny.POLSKIE_LITERY_SPACJA_MYSLNIK, e);
             textbox_nrDomu.KeyPress += (s, e) => RegexPatterny.SprawdzCzyMoznaKliknacPrzycisk(RegexPatterny.LICZBY_LITERY_UKOSNIK, e);
             textbox_nrMieszkania.KeyPress += (s, e) => RegexPatterny.SprawdzCzyMoznaKliknacPrzycisk(RegexPatterny.LICZBY_LITERY_UKOSNIK, e);
+
+            if (_pacjent != null)
+            {
+                WypelnijDane();
+                btnZarejestruj.Text = "Zapisz zmiany";
+            }
         }
+        private void WypelnijDane()
+        {
+            textbox_imie.Text = _pacjent.Imiona;
+            textbox_nazwisko.Text = _pacjent.Nazwisko;
+            textbox_pesel.Text = _pacjent.Pesel;
+
+            if (_pacjent.CzyMezczyzna)
+                comboBox_plec.SelectedItem = "Mężczyzna";
+            else
+                comboBox_plec.SelectedItem = "Kobieta";
+
+            dateTimePicker_dataUrodzenia.Value = _pacjent.DataUrodzenia;
+            textbox_telefon.Text = _pacjent.Telefon;
+            textbox_email.Text = _pacjent.Email;
+            textbox_miejscowosc.Text = _pacjent.Miejscowosc;
+            textbox_kodPocztowy.Text = _pacjent.KodPocztowy;
+            textbox_ulica.Text = _pacjent.Ulica;
+            textbox_nrDomu.Text = _pacjent.NumerPosesji;
+            textbox_nrMieszkania.Text = _pacjent.NumerLokalu;
+        }
+
 
         private void btnZarejestruj_Click(object sender, EventArgs e)
         {
@@ -44,7 +74,7 @@ namespace Przychodnia
             bool czyMezczyzna = (comboBox_plec.Text == "Mężczyzna");
 
             // 2. Walidacja logiki PESEL
-            var walidacjaPesel = Narzedzia.SprawdzPesel(pesel, dateTimePicker_dataUrodzenia.Value, czyMezczyzna);
+            var walidacjaPesel = Narzedzia.SprawdzPesel(pesel, dateTimePicker_dataUrodzenia.Value, czyMezczyzna, false);
             if (!walidacjaPesel.Poprawny)
             {
                 MessageBox.Show(walidacjaPesel.Komunikat, "Błąd", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -66,49 +96,55 @@ namespace Przychodnia
                 return;
             }
 
-            // 4. Unikalność w Bazie
-            if (BazaDanych.CzyPeselZajety(pesel, 0))
+            int idUzytkownika = _pacjent != null ? _pacjent.Id : 0;
+            if (BazaDanych.CzyPeselZajety(pesel, idUzytkownika))
             {
-                MessageBox.Show("Pacjent o takich danych PESEL jest już zarejestrowany.", "Błąd", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Pacjent o takich danych PESEL jest już zarejestrowany.", "Błąd unikalności", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
-            if (!string.IsNullOrWhiteSpace(email) && BazaDanych.CzyEmailZajety(email, 0))
+            if (!string.IsNullOrWhiteSpace(email) && BazaDanych.CzyEmailZajety(email, idUzytkownika))
             {
-                MessageBox.Show("Pacjent o takich danych E-mail jest już zarejestrowany", "Błąd", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Pacjent o takich danych E-mail jest już zarejestrowany.", "Błąd unikalności", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
             // ======== ZAPIS ========
 
-            // Korzystamy z metody do wygenerowania bezpiecznego hasła dla nowego pacjenta
+            Uzytkownik pacjentDoZapisu = _pacjent ?? new Uzytkownik();
+
+            pacjentDoZapisu.Imiona = textbox_imie.Text.Trim();
+            pacjentDoZapisu.Nazwisko = textbox_nazwisko.Text.Trim();
+            pacjentDoZapisu.Pesel = pesel;
+            pacjentDoZapisu.DataUrodzenia = dateTimePicker_dataUrodzenia.Value;
+            pacjentDoZapisu.CzyMezczyzna = czyMezczyzna;
+            pacjentDoZapisu.Telefon = textbox_telefon.Text.Trim();
+            pacjentDoZapisu.Email = email;
+            pacjentDoZapisu.Miejscowosc = textbox_miejscowosc.Text.Trim();
+            pacjentDoZapisu.KodPocztowy = textbox_kodPocztowy.Text.Trim();
+            pacjentDoZapisu.Ulica = textbox_ulica.Text.Trim();
+            pacjentDoZapisu.NumerPosesji = textbox_nrDomu.Text.Trim();
+            pacjentDoZapisu.NumerLokalu = textbox_nrMieszkania.Text.Trim();
+
+            if (_pacjent != null)
+            {
+                if (BazaDanych.DodajLubZaaktualizujUzytkownika(pacjentDoZapisu))
+                {
+                    MessageBox.Show("Dane pacjenta zostały zaktualizowane pomyślnie.", "Sukces", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    ZamknijPanel();
+                }
+                return;
+            }
             string noweHaslo = Narzedzia.GenerujSilneHaslo();
 
-            Uzytkownik nowyPacjent = new Uzytkownik
+            pacjentDoZapisu.Id = 0;
+            pacjentDoZapisu.Login = "pacjent_" + pesel;
+            pacjentDoZapisu.Haslo = noweHaslo;
+            pacjentDoZapisu.IdRol.Add(Role.ZdobadzIdRoli(Role.PACJENT));
+
+            if (BazaDanych.DodajLubZaaktualizujUzytkownika(pacjentDoZapisu))
             {
-                Id = 0,
-                Imiona = textbox_imie.Text.Trim(),
-                Nazwisko = textbox_nazwisko.Text.Trim(),
-                Pesel = pesel,
-                DataUrodzenia = dateTimePicker_dataUrodzenia.Value,
-                CzyMezczyzna = czyMezczyzna,
-                Telefon = textbox_telefon.Text.Trim(),
-                Email = email,
-                Miejscowosc = textbox_miejscowosc.Text.Trim(),
-                KodPocztowy = textbox_kodPocztowy.Text.Trim(),
-                Ulica = textbox_ulica.Text.Trim(),
-                NumerPosesji = textbox_nrDomu.Text.Trim(),
-                NumerLokalu = textbox_nrMieszkania.Text.Trim(),
-
-                Login = "pacjent_" + pesel,
-                Haslo = noweHaslo
-            };
-
-            nowyPacjent.IdRol.Add(4);
-
-            if (BazaDanych.DodajLubZaaktualizujUzytkownika(nowyPacjent))
-            {
-                MessageBox.Show($"Dodano pacjenta\n\nLogin: {nowyPacjent.Login}\nHasło: {noweHaslo}\n\n(Hasło zostało skopiowane do schowka).",
+                MessageBox.Show($"Dodano pacjenta\n\nLogin: {pacjentDoZapisu.Login}\nHasło: {noweHaslo}\n\n(Hasło zostało skopiowane do schowka).",
                                 "Sukces", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 WyczyscPola();
             }
@@ -116,8 +152,7 @@ namespace Przychodnia
 
         private void btnAnuluj_Click(object sender, EventArgs e)
         {
-            Form okno = this.FindForm();
-            if (okno != null) okno.Close();
+            ZamknijPanel();
         }
 
         private void WyczyscPola()
@@ -135,6 +170,12 @@ namespace Przychodnia
 
             comboBox_plec.SelectedIndex = -1;
             dateTimePicker_dataUrodzenia.Value = DateTime.Now;
+        }
+
+        private void ZamknijPanel()
+        {
+            Form okno = this.FindForm();
+            if (okno != null) okno.Close();
         }
     }
 }

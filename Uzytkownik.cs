@@ -16,8 +16,6 @@ namespace Przychodnia
 
         public bool CzyMezczyzna { get; set; }
 
-        public string Plec => CzyMezczyzna ? "Mężczyzna" : "Kobieta";
-
         public DateTime DataUrodzenia { get; set; }
         public string Telefon { get; set; }
         public string Miejscowosc { get; set; }
@@ -29,7 +27,8 @@ namespace Przychodnia
 
         public string PobierzWszystkieDane()
         {
-            return $"{Login} {Email} {Imiona} {Nazwisko} {Pesel} {Plec} {Telefon} {Miejscowosc} {Ulica} {KodPocztowy} {NumerPosesji} {NumerLokalu} {DataUrodzenia.ToString("dd.MM.yyyy")}".ToLower();
+            string plec = CzyMezczyzna ? "Mężczyzna" : "Kobieta";
+            return $"{Login} {Email} {Imiona} {Nazwisko} {Pesel} {plec} {Telefon} {Miejscowosc} {Ulica} {KodPocztowy} {NumerPosesji} {NumerLokalu} {DataUrodzenia.ToString("dd.MM.yyyy")}".ToLower();
         }
 
         public List<int> IdRol { get; set; } = new List<int>();
