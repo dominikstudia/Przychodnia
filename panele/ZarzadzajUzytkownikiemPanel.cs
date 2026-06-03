@@ -155,7 +155,7 @@ namespace Przychodnia
             var walidacjaPesel = Narzedzia.SprawdzPesel(textbox_pesel.Text, datetimerpicker_data_urodzenia.Value, combobox_plec.SelectedItem.ToString() == "Mężczyzna");
             if (!walidacjaPesel.Poprawny)
             {
-                MessageBox.Show("Pesel nie zgadza się z datą urodzenia użytkownika lub płcią!", "Błąd", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(walidacjaPesel.Komunikat, "Błąd", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 

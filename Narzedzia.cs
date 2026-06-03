@@ -29,6 +29,13 @@ namespace Przychodnia
 
             if (dataUrodzenia.Year != pelnyRok || dataUrodzenia.Month != miesiac || dataUrodzenia.Day != dzien) return (false, blad);
 
+            var uzytkownicy = BazaDanych.Uzytkownicy;
+            if (uzytkownicy != null && uzytkownicy.Any(u => u.Pesel == pesel))
+            {
+                return (false, "Taki numer PESEL istnieje juz w bazie danych.");
+            }
+
+
             return (true, "");
         }
 
