@@ -42,23 +42,6 @@ namespace Przychodnia
             return (true, "");
         }
 
-        public static (bool Poprawny, string Komunikat) SprawdzEmail(string email)
-        {
-            if (string.IsNullOrWhiteSpace(email)) return (true, "");
-            if (email.Length > 25 || !Regex.IsMatch(email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
-                return (false, "Nieprawidłowy format adresu e-mail");
-            return (true, "");
-        }
-
-        public static (bool Poprawny, string Komunikat) SprawdzTelefon(string telefon)
-        {
-            if (string.IsNullOrWhiteSpace(telefon)) return (false, "Pole jest wymagane");
-            if (telefon.Length != 9 || !Regex.IsMatch(telefon, @"^\d{9}$"))
-                return (false, "Nieprawidłowy numer telefonu ");
-            return (true, "");
-        }
-
-
         // Metody nie zostały napisane przeze mnie [Dominik] - zostały przeniesione z klasy BazaDanych.cs ponieważ nie tam jest ich miejsce
         public static string GenerujSilneHaslo()
         {

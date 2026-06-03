@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
 namespace Przychodnia
@@ -82,17 +83,16 @@ namespace Przychodnia
             }
 
             // 3. Walidacja logiki Telefonu i Emaila
-            var walidacjaTel = Narzedzia.SprawdzTelefon(textbox_telefon.Text.Trim());
-            if (!walidacjaTel.Poprawny)
+            // Poprawiono - nie ma potrzeby sprawdzania bo jest maska, komunikat 1;1 wziety ten sam
+            if (string.IsNullOrWhiteSpace(textbox_telefon.Text.Trim()))
             {
-                MessageBox.Show(walidacjaTel.Komunikat, "Błąd", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Pole jest wymagane", "Błąd", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
-            var walidacjaEmail = Narzedzia.SprawdzEmail(email);
-            if (!walidacjaEmail.Poprawny)
-            {
-                MessageBox.Show(walidacjaEmail.Komunikat, "Błąd", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            // Poprawiono - nie ma potrzeby robic na to metody, choc nie rozumiem [ale wzialem 1;1 ten sam kod, zeby nie bylo niespojnosci] czemu jest blad jak jest email > 25 znakow
+            if (!string.IsNullOrWhiteSpace(email) && (email.Length > 25 || !Regex.IsMatch(email, RegexPatterny.WALIDATOR_EMAIL))) {
+                MessageBox.Show("Nieprawidłowy format adresu e-mail", "Błąd", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
