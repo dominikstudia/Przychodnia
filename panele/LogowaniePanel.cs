@@ -97,7 +97,7 @@ namespace Przychodnia
                 }
 
                 // Jeśli hasło zostało zmienione poprawnie (albo w ogóle nie wymagało zmiany), wpuszczamy do systemu
-                ((Form1)this.FindForm()).OdblokujSystemPoZalogowaniu();
+                ((FormularzGlowny)this.FindForm()).OdblokujSystemPoZalogowaniu();
             }
             else
             {

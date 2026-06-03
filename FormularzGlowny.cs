@@ -4,9 +4,9 @@ using System.Data;
 
 namespace Przychodnia
 {
-    public partial class Form1 : Form
+    public partial class FormularzGlowny : Form
     {
-        public Form1()
+        public FormularzGlowny()
         {
             InitializeComponent();
             PokazEkranLogowania();
@@ -41,7 +41,7 @@ namespace Przychodnia
             przycisk_dodaj_pacjenta.Visible = czyRecepcjonista;
             przycisk_wyszukaj_uzytkownika.Visible = (czyAdmin || czyRecepcjonista);
             przycisk_lista_wizyt.Visible = (czyLekarz || czyRecepcjonista);
-            przycisk_specjalizacja.Visible = czyAdmin;
+            przycisk_specjalizacje.Visible = czyAdmin;
 
             przycisk_wyszukaj_uzytkownika.Text = czyAdmin ? "Lista użytkowników" : "Wyszukaj pacjenta";
         }
@@ -116,7 +116,7 @@ namespace Przychodnia
             label_ogolny.Text = "Przegląd wizyt pacjentów";
         }
 
-        private void przycisk_specjalizacja_Click(object sender, EventArgs e)
+        private void przycisk_specjalizacje_Click(object sender, EventArgs e)
         {
             panel_edycji.Controls.Clear();
 

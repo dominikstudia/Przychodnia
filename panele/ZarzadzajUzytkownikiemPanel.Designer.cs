@@ -110,7 +110,7 @@
             tableLayoutPanel1.Location = new Point(0, 0);
             tableLayoutPanel1.Name = "tableLayoutPanel1";
             tableLayoutPanel1.RowCount = 19;
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 5.49763775F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 5.497638F));
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 5.49763775F));
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 5.49763775F));
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 5.49763775F));

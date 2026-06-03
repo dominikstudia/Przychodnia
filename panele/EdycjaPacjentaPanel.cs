@@ -68,7 +68,7 @@ namespace Przychodnia
             bool czyMezczyzna = (comboBox_plec.Text == "Mężczyzna");
 
             // 2. Walidacja logiki PESEL
-            var walidacjaPesel = Walidator.SprawdzPesel(pesel, dateTimePicker_dataUrodzenia.Value, czyMezczyzna);
+            var walidacjaPesel = Narzedzia.SprawdzPesel(pesel, dateTimePicker_dataUrodzenia.Value, czyMezczyzna);
             if (!walidacjaPesel.Poprawny)
             {
                 MessageBox.Show(walidacjaPesel.Komunikat, "Błąd", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -76,7 +76,7 @@ namespace Przychodnia
             }
 
             // 3. Walidacja logiki Telefonu i Emaila
-            var walidacjaTel = Walidator.SprawdzTelefon(textbox_telefon.Text.Trim());
+            var walidacjaTel = Narzedzia.SprawdzTelefon(textbox_telefon.Text.Trim());
             if (!walidacjaTel.Poprawny)
             {
                 MessageBox.Show(walidacjaTel.Komunikat, "Błąd", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -85,7 +85,7 @@ namespace Przychodnia
 
             if (!string.IsNullOrWhiteSpace(email))
             {
-                var walidacjaEmail = Walidator.SprawdzEmail(email);
+                var walidacjaEmail = Narzedzia.SprawdzEmail(email);
                 if (!walidacjaEmail.Poprawny)
                 {
                     MessageBox.Show(walidacjaEmail.Komunikat, "Błąd", MessageBoxButtons.OK, MessageBoxIcon.Warning);

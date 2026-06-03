@@ -12,50 +12,10 @@ namespace Przychodnia
 {
     internal class BazaDanych
     {
-        public static readonly string POLACZENIE_STRING = @"Server=(localdb)\local;Database=Przychodnia;Trusted_Connection=True;TrustServerCertificate=True;";
+        public static readonly string POLACZENIE_STRING = @"Server=localhost\SQLEXPRESS;Database=Przychodnia;Trusted_Connection=True;TrustServerCertificate=True;";
 
         public static BindingList<Uzytkownik> Uzytkownicy { get; set; } = new BindingList<Uzytkownik>();
         public static Uzytkownik? ZALOGOWANY_UZYTKOWNIK { get; set; } = null;
-
-        public static string HashujHaslo(string haslo)
-        {
-            if (string.IsNullOrEmpty(haslo)) return "";
-
-            using (System.Security.Cryptography.SHA256 sha256 = System.Security.Cryptography.SHA256.Create())
-            {
-                byte[] bytes = sha256.ComputeHash(System.Text.Encoding.UTF8.GetBytes(haslo));
-                System.Text.StringBuilder builder = new System.Text.StringBuilder();
-                foreach (byte b in bytes)
-                {
-                    builder.Append(b.ToString("x2"));
-                }
-                return builder.ToString();
-            }
-        }
-
-        public static (bool CzySaBledy, string Komunikat) SprawdzSileHasla(string haslo, string login = "")
-        {
-            if (string.IsNullOrEmpty(haslo)) return (true, "Hasło nie może być puste.");
-
-            List<string> bledy = new List<string>();
-
-            if (haslo.Length < 8) bledy.Add("- jest za krótkie (minimum 8 znaków)");
-            if (haslo.Length > 15) bledy.Add("- jest za długie (maksymalnie 15 znaków)");
-            if (!string.IsNullOrEmpty(login) && haslo.Equals(login, StringComparison.OrdinalIgnoreCase))
-                bledy.Add("- nie może być takie samo jak login użytkownika");
-            if (!haslo.Any(char.IsUpper)) bledy.Add("- nie zawiera wielkiej litery");
-            if (!haslo.Any(char.IsLower)) bledy.Add("- nie zawiera małej litery");
-            if (!haslo.Any(char.IsDigit)) bledy.Add("- nie zawiera cyfry");
-            if (!haslo.Any(ch => !char.IsLetterOrDigit(ch))) bledy.Add("- nie zawiera znaku specjalnego");
-
-            if (bledy.Count > 0)
-            {
-                string komunikat = "Hasło nie spełnia wymagań bezpieczeństwa, ponieważ:\n\n" + string.Join("\n", bledy);
-                return (true, komunikat);
-            }
-
-            return (false, "");
-        }
 
         public static void ZaladujBazeDanych()
         {
@@ -156,7 +116,7 @@ namespace Przychodnia
                                                VALUES (@Login, @Pass, @Email, @FirstName, @LastName, @Pesel, @BD, @Gen, @Phone, @City, @Postal, @Street, @HN, @AN, @IsArchived, GETDATE(), 0, 0)";
 
                             int nowyId;
-                            string hashedPass = HashujHaslo(uzytkownik.Haslo ?? "");
+                            string hashedPass = Narzedzia.HashujHaslo(uzytkownik.Haslo ?? "");
                             using (var cmdUser = new Microsoft.Data.SqlClient.SqlCommand(sqlUser, polaczenie, transakcja))
                             {
                                 cmdUser.Parameters.AddWithValue("@Login", uzytkownik.Login ?? "");
@@ -220,7 +180,7 @@ namespace Przychodnia
 
                                 if (!string.IsNullOrEmpty(uzytkownik.Haslo))
                                 {
-                                    string hashedPass = HashujHaslo(uzytkownik.Haslo);
+                                    string hashedPass = Narzedzia.HashujHaslo(uzytkownik.Haslo);
                                     cmd.Parameters.AddWithValue("@Pass", hashedPass);
                                     cmd.ExecuteNonQuery();
 
@@ -274,18 +234,13 @@ namespace Przychodnia
             }
         }
 
-        public static bool ZaarchiwizujUzytkownika(Uzytkownik wybrany)
+        public static void ZaarchiwizujUzytkownika(Uzytkownik wybrany)
         {
-            // Kopia zapasowa na wypadek błędu bazy (żeby interfejs nie zgłupiał)
-            string stareImie = wybrany.Imiona;
-            string stareNazwisko = wybrany.Nazwisko;
-
             wybrany.Imiona = "Zarchiwizowane";
             wybrany.Nazwisko = "Dane";
             wybrany.Email = $"brak_{wybrany.Id}@danych.pl";
             wybrany.Pesel = wybrany.Id.ToString().PadLeft(11, '0');
 
-            // Zamiast "", użyj bezpiecznych "wypełniaczy", które przejdą przez wymogi SQL
             wybrany.Telefon = "000000000";
             wybrany.Miejscowosc = "Brak";
             wybrany.Ulica = "Brak";
@@ -293,18 +248,9 @@ namespace Przychodnia
             wybrany.NumerPosesji = "0";
             wybrany.NumerLokalu = "0";
             wybrany.CzyZarchiwizowany = true;
+            wybrany.IdRol.Clear();
 
-            bool sukces = DodajLubZaaktualizujUzytkownika(wybrany);
-
-            // Jeśli zapis do bazy nie powiódł się, cofamy zmiany, żeby interfejs wyświetlał prawdę
-            if (!sukces)
-            {
-                wybrany.Imiona = stareImie;
-                wybrany.Nazwisko = stareNazwisko;
-                wybrany.CzyZarchiwizowany = false;
-            }
-
-            return sukces;
+            DodajLubZaaktualizujUzytkownika(wybrany);
         }
 
         public static void MasowoNadajRole(List<Uzytkownik> zaznaczeni, int id)
@@ -360,7 +306,7 @@ namespace Przychodnia
                                     return (false, "dany login został zablokowany", blokada.Value, false);
 
                                 // Akceptujemy prawidłowy Hash ORAZ awaryjnie jawny tekst
-                                if (dbHash == HashujHaslo(haslo) || dbHash == haslo)
+                                if (dbHash == Narzedzia.HashujHaslo(haslo) || dbHash == haslo)
                                 {
                                     czytnik.Close();
 
@@ -368,7 +314,7 @@ namespace Przychodnia
                                     string naprawQuery = "UPDATE Users SET PasswordHash = @Hash, FailedLoginAttempts = 0, BlockedUntil = NULL WHERE UserID = @Id";
                                     using (var cmdNapraw = new Microsoft.Data.SqlClient.SqlCommand(naprawQuery, polaczenie))
                                     {
-                                        cmdNapraw.Parameters.AddWithValue("@Hash", HashujHaslo(haslo));
+                                        cmdNapraw.Parameters.AddWithValue("@Hash", Narzedzia.HashujHaslo(haslo));
                                         cmdNapraw.Parameters.AddWithValue("@Id", id);
                                         cmdNapraw.ExecuteNonQuery();
                                     }
@@ -434,8 +380,8 @@ namespace Przychodnia
                     }
 
                     // 2. Generujemy hasło i hashujemy je
-                    string noweHaslo = GenerujSilneHaslo();
-                    string hashedPass = HashujHaslo(noweHaslo);
+                    string noweHaslo = Narzedzia.GenerujSilneHaslo();
+                    string hashedPass = Narzedzia.HashujHaslo(noweHaslo);
 
                     // 3. Update hasła w bazie i zapis do historii
                     string updateSql = @"UPDATE Users SET PasswordHash = @Hash, WymagaZmianyHasla = 1, FailedLoginAttempts = 0, BlockedUntil = NULL WHERE UserID = @Id;
@@ -493,45 +439,9 @@ namespace Przychodnia
             }
         }
 
-        public static string GenerujSilneHaslo()
-        {
-            const string male = "abcdefghijklmnopqrstuvwxyz";
-            const string duze = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-            const string cyfry = "0123456789";
-            const string znaki = "!@#$%^&*()_+-=[]{};:,.<>?";
-
-            Random rnd = new Random();
-            char[] haslo = new char[10];
-
-            for (int i = 0; i < 3; i++) haslo[i] = male[rnd.Next(male.Length)];
-            for (int i = 3; i < 6; i++) haslo[i] = duze[rnd.Next(duze.Length)];
-            for (int i = 6; i < 8; i++) haslo[i] = cyfry[rnd.Next(cyfry.Length)];
-            for (int i = 8; i < 10; i++) haslo[i] = znaki[rnd.Next(znaki.Length)];
-
-            // Składamy hasło w całość
-            string gotoweHaslo = new string(haslo.OrderBy(x => rnd.Next()).ToArray());
-
-            // Automatyczne kopiowanie do schowka z zabezpieczeniem
-            try
-            {
-                System.Windows.Forms.Clipboard.SetText(gotoweHaslo);
-            }
-            catch (Exception ex)
-            {
-                // Wyświetlamy ostrzeżenie, jeśli Windows zablokuje dostęp do schowka
-                System.Windows.Forms.MessageBox.Show(
-                    "Hasło zostało wygenerowane, ale system zablokował automatyczne skopiowanie go do schowka.\nMusisz skopiować je ręcznie.\n\nSzczegóły: " + ex.Message,
-                    "Błąd schowka",
-                    System.Windows.Forms.MessageBoxButtons.OK,
-                    System.Windows.Forms.MessageBoxIcon.Warning);
-            }
-
-            return gotoweHaslo;
-        }
-
         public static bool CzyHasloByloUzyteOstatnio(int userId, string noweHaslo)
         {
-            string hashNowegoHasla = HashujHaslo(noweHaslo);
+            string hashNowegoHasla = Narzedzia.HashujHaslo(noweHaslo);
             try
             {
                 using (var polaczenie = new Microsoft.Data.SqlClient.SqlConnection(POLACZENIE_STRING))

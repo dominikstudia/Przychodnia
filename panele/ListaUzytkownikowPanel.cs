@@ -202,8 +202,10 @@ namespace Przychodnia
 
             var wynik = MessageBox.Show($"Czy na pewno chcesz zarchiwizować profil: {wybrany.Imiona} {wybrany.Nazwisko}?", "Potwierdzenie", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
 
-            if (wynik == DialogResult.Yes && BazaDanych.ZaarchiwizujUzytkownika(wybrany))
+
+            if (wynik == DialogResult.Yes)
             {
+                BazaDanych.ZaarchiwizujUzytkownika(wybrany);
                 MessageBox.Show("Profil został zarchiwizowany");
                 btn_szukaj_Click(null, null);
             }

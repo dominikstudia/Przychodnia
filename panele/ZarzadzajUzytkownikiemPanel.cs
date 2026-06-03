@@ -140,7 +140,7 @@ namespace Przychodnia
                 string loginUzytkownika = textbox_login.Text.Trim();
                 string wpisaneHaslo = textbox_haslo.Text;
 
-                var walidacja = BazaDanych.SprawdzSileHasla(wpisaneHaslo, loginUzytkownika);
+                var walidacja = Narzedzia.SprawdzSileHasla(wpisaneHaslo, loginUzytkownika);
                 if (walidacja.CzySaBledy)
                 {
                     MessageBox.Show(walidacja.Komunikat, "Hasło zbyt słabe", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -154,9 +154,8 @@ namespace Przychodnia
                 }
             }
 
-            // Sprawdzenie PESEL
-            DateTime data = datetimerpicker_data_urodzenia.Value;
-            if (!SprawdzPesel(textbox_pesel.Text, combobox_plec.SelectedItem.ToString() == "Mężczyzna", data))
+            var walidacjaPesel = Narzedzia.SprawdzPesel(textbox_pesel.Text, datetimerpicker_data_urodzenia.Value, combobox_plec.SelectedItem.ToString() == "Mężczyzna");
+            if (!walidacjaPesel.Poprawny)
             {
                 MessageBox.Show("Pesel nie zgadza się z datą urodzenia użytkownika lub płcią!", "Błąd", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
@@ -219,7 +218,7 @@ namespace Przychodnia
 
         private void btn_wygeneruj_Click(object sender, EventArgs e)
         {
-            string noweHaslo = BazaDanych.GenerujSilneHaslo();
+            string noweHaslo = Narzedzia.GenerujSilneHaslo();
             textbox_haslo.Text = noweHaslo;
             MessageBox.Show("Wygenerowano nowe, bezpieczne hasło.", "Sukces", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
@@ -229,25 +228,6 @@ namespace Przychodnia
             Form okno = this.FindForm();
             if (okno != null && okno.Name != "Form1") okno.Close();
             else this.Parent?.Controls.Remove(this);
-        }
-
-        // --- Walidacja PESEL i zdarzenia KeyPress (pozostały bez zmian jak w oryginale) ---
-        private Boolean SprawdzPesel(String pesel, Boolean czyMezczyzna, DateTime data)
-        {
-            if (pesel == null || !Regex.IsMatch(pesel, @"^\d{11}$")) return false;
-            int rok = data.Year;
-            int sformatowanyMiesiac = data.Month;
-            if (rok < 1900 || rok > 2100) return false;
-            if (rok >= 2000) sformatowanyMiesiac += 20;
-            string oczekiwanyPoczatek = $"{rok % 100:D2}{sformatowanyMiesiac:D2}{data.Day:D2}";
-            if (!pesel.StartsWith(oczekiwanyPoczatek)) return false;
-            bool czyPeselWskazujeMezczyzne = int.Parse(pesel[9].ToString()) % 2 != 0;
-            if (czyPeselWskazujeMezczyzne != czyMezczyzna) return false;
-            int[] wagi = { 1, 3, 7, 9, 1, 3, 7, 9, 1, 3 };
-            int suma = 0;
-            for (int i = 0; i < 10; i++) suma += int.Parse(pesel[i].ToString()) * wagi[i];
-            int cyfraKontrolna = (10 - (suma % 10)) % 10;
-            return cyfraKontrolna == int.Parse(pesel[10].ToString());
         }
 
         private void textbox_pesel_Click(object sender, EventArgs e) => textbox_pesel.SelectionStart = 0;

@@ -56,7 +56,7 @@ namespace Przychodnia.formsy
                 return;
             }
 
-            var walidacja = BazaDanych.SprawdzSileHasla(noweHaslo, aktualnyLogin);
+            var walidacja = Narzedzia.SprawdzSileHasla(noweHaslo, aktualnyLogin);
             if (walidacja.CzySaBledy)
             {
                 MessageBox.Show(walidacja.Komunikat, "Hasło zbyt słabe", MessageBoxButtons.OK, MessageBoxIcon.Warning);

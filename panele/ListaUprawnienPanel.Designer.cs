@@ -48,11 +48,11 @@
             lbl_instrukcja.AutoSize = true;
             lbl_instrukcja.Font = new Font("Segoe UI", 18F);
             lbl_instrukcja.ForeColor = SystemColors.ControlDarkDark;
-            lbl_instrukcja.Location = new Point(70, 48);
+            lbl_instrukcja.Location = new Point(344, 41);
             lbl_instrukcja.Name = "lbl_instrukcja";
-            lbl_instrukcja.Size = new Size(749, 32);
+            lbl_instrukcja.Size = new Size(215, 32);
             lbl_instrukcja.TabIndex = 1;
-            lbl_instrukcja.Text = "Wybierz rolę z listy i kliknij dwukrotnie, aby zarządzać użytkownikami";
+            lbl_instrukcja.Text = "Wybierz rolę z listy";
             // 
             // btn_wyswietl_uzytkownikow
             // 

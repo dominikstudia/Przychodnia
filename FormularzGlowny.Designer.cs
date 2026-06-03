@@ -1,6 +1,6 @@
 ﻿namespace Przychodnia
 {
-    partial class Form1
+    partial class FormularzGlowny
     {
         /// <summary>
         ///  Required designer variable.
@@ -29,7 +29,6 @@
         private void InitializeComponent()
         {
             panel_boczny = new Panel();
-            przycisk_specjalizacja = new Button();
             przycisk_lista_wizyt = new Button();
             przycisk_dodaj_pacjenta = new Button();
             btn_zmien_haslo = new Button();
@@ -40,6 +39,7 @@
             panel_informacyjny = new Panel();
             label_ogolny = new Label();
             panel_edycji = new Panel();
+            przycisk_specjalizacje = new Button();
             panel_boczny.SuspendLayout();
             panel_informacyjny.SuspendLayout();
             SuspendLayout();
@@ -47,7 +47,7 @@
             // panel_boczny
             // 
             panel_boczny.BackColor = SystemColors.ControlDark;
-            panel_boczny.Controls.Add(przycisk_specjalizacja);
+            panel_boczny.Controls.Add(przycisk_specjalizacje);
             panel_boczny.Controls.Add(przycisk_lista_wizyt);
             panel_boczny.Controls.Add(przycisk_dodaj_pacjenta);
             panel_boczny.Controls.Add(btn_zmien_haslo);
@@ -60,16 +60,6 @@
             panel_boczny.Name = "panel_boczny";
             panel_boczny.Size = new Size(200, 581);
             panel_boczny.TabIndex = 0;
-            // 
-            // przycisk_specjalizacja
-            // 
-            przycisk_specjalizacja.Location = new Point(0, 375);
-            przycisk_specjalizacja.Name = "przycisk_specjalizacja";
-            przycisk_specjalizacja.Size = new Size(200, 70);
-            przycisk_specjalizacja.TabIndex = 7;
-            przycisk_specjalizacja.Text = "Specjalizacje";
-            przycisk_specjalizacja.UseVisualStyleBackColor = true;
-            przycisk_specjalizacja.Click += przycisk_specjalizacja_Click;
             // 
             // przycisk_lista_wizyt
             // 
@@ -181,7 +171,18 @@
             panel_edycji.Size = new Size(864, 581);
             panel_edycji.TabIndex = 2;
             // 
-            // Form1
+            // przycisk_specjalizacje
+            // 
+            przycisk_specjalizacje.Dock = DockStyle.Bottom;
+            przycisk_specjalizacje.Location = new Point(0, 371);
+            przycisk_specjalizacje.Name = "przycisk_specjalizacje";
+            przycisk_specjalizacje.Size = new Size(200, 70);
+            przycisk_specjalizacje.TabIndex = 7;
+            przycisk_specjalizacje.Text = "Specjalizacje";
+            przycisk_specjalizacje.UseVisualStyleBackColor = true;
+            przycisk_specjalizacje.Click += this.przycisk_specjalizacje_Click;
+            // 
+            // Przychodnia
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
@@ -189,7 +190,7 @@
             Controls.Add(panel_edycji);
             Controls.Add(panel_boczny);
             Controls.Add(panel_informacyjny);
-            Name = "Form1";
+            Name = "Przychodnia";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Testowanie oprogramowania";
             panel_boczny.ResumeLayout(false);
@@ -210,6 +211,6 @@
         private Button btn_zmien_haslo;
         private Button przycisk_dodaj_pacjenta;
         private Button przycisk_lista_wizyt;
-        private Button przycisk_specjalizacja;
+        private Button przycisk_specjalizacje;
     }
 }
