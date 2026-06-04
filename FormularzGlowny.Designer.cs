@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             panel_boczny = new Panel();
+            przycisk_specjalizacje = new Button();
             przycisk_lista_wizyt = new Button();
             przycisk_dodaj_pacjenta = new Button();
             btn_zmien_haslo = new Button();
@@ -39,7 +40,6 @@
             panel_informacyjny = new Panel();
             label_ogolny = new Label();
             panel_edycji = new Panel();
-            przycisk_specjalizacje = new Button();
             panel_boczny.SuspendLayout();
             panel_informacyjny.SuspendLayout();
             SuspendLayout();
@@ -58,8 +58,19 @@
             panel_boczny.Dock = DockStyle.Left;
             panel_boczny.Location = new Point(0, 100);
             panel_boczny.Name = "panel_boczny";
-            panel_boczny.Size = new Size(200, 581);
+            panel_boczny.Size = new Size(200, 631);
             panel_boczny.TabIndex = 0;
+            // 
+            // przycisk_specjalizacje
+            // 
+            przycisk_specjalizacje.Dock = DockStyle.Bottom;
+            przycisk_specjalizacje.Location = new Point(0, 421);
+            przycisk_specjalizacje.Name = "przycisk_specjalizacje";
+            przycisk_specjalizacje.Size = new Size(200, 70);
+            przycisk_specjalizacje.TabIndex = 7;
+            przycisk_specjalizacje.Text = "Specjalizacje";
+            przycisk_specjalizacje.UseVisualStyleBackColor = true;
+            przycisk_specjalizacje.Click += przycisk_specjalizacje_Click;
             // 
             // przycisk_lista_wizyt
             // 
@@ -86,7 +97,7 @@
             // btn_zmien_haslo
             // 
             btn_zmien_haslo.Dock = DockStyle.Bottom;
-            btn_zmien_haslo.Location = new Point(0, 441);
+            btn_zmien_haslo.Location = new Point(0, 491);
             btn_zmien_haslo.Name = "btn_zmien_haslo";
             btn_zmien_haslo.Size = new Size(200, 70);
             btn_zmien_haslo.TabIndex = 4;
@@ -97,7 +108,7 @@
             // btn_wyloguj
             // 
             btn_wyloguj.Dock = DockStyle.Bottom;
-            btn_wyloguj.Location = new Point(0, 511);
+            btn_wyloguj.Location = new Point(0, 561);
             btn_wyloguj.Name = "btn_wyloguj";
             btn_wyloguj.Size = new Size(200, 70);
             btn_wyloguj.TabIndex = 3;
@@ -168,29 +179,18 @@
             panel_edycji.Dock = DockStyle.Fill;
             panel_edycji.Location = new Point(200, 100);
             panel_edycji.Name = "panel_edycji";
-            panel_edycji.Size = new Size(864, 581);
+            panel_edycji.Size = new Size(864, 631);
             panel_edycji.TabIndex = 2;
             // 
-            // przycisk_specjalizacje
-            // 
-            przycisk_specjalizacje.Dock = DockStyle.Bottom;
-            przycisk_specjalizacje.Location = new Point(0, 371);
-            przycisk_specjalizacje.Name = "przycisk_specjalizacje";
-            przycisk_specjalizacje.Size = new Size(200, 70);
-            przycisk_specjalizacje.TabIndex = 7;
-            przycisk_specjalizacje.Text = "Specjalizacje";
-            przycisk_specjalizacje.UseVisualStyleBackColor = true;
-            przycisk_specjalizacje.Click += this.przycisk_specjalizacje_Click;
-            // 
-            // Przychodnia
+            // FormularzGlowny
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1064, 681);
+            ClientSize = new Size(1064, 731);
             Controls.Add(panel_edycji);
             Controls.Add(panel_boczny);
             Controls.Add(panel_informacyjny);
-            Name = "Przychodnia";
+            Name = "FormularzGlowny";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Testowanie oprogramowania";
             panel_boczny.ResumeLayout(false);
