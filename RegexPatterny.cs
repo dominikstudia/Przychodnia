@@ -18,7 +18,6 @@ namespace Przychodnia
         public const string POLSKIE_LITERY_MYSLNIK = @"[^a-zA-ZąćęłńóśżźĄĆĘŁŃÓŚŻŹ\-]";
 
         public const string WALIDATOR_EMAIL = @"^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$";
-        public const string HASLO = @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_\-+={\[}\]|:;""'<,>.?/]).{8,15}$";
 
         private static bool SprawdzCzyUsunac(char klawisz, string pattern)
         {

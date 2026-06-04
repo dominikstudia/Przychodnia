@@ -43,7 +43,7 @@ namespace Przychodnia
         }
 
         // Metody nie zostały napisane przeze mnie [Dominik] - zostały przeniesione z klasy BazaDanych.cs ponieważ nie tam jest ich miejsce
-        public static string GenerujSilneHaslo()
+        public static string GenerujSilneHaslo(bool kopiujDoSchowka = true)
         {
             const string male = "abcdefghijklmnopqrstuvwxyz";
             const string duze = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -62,20 +62,22 @@ namespace Przychodnia
             string gotoweHaslo = new string(haslo.OrderBy(x => rnd.Next()).ToArray());
 
             // Automatyczne kopiowanie do schowka z zabezpieczeniem
-            try
+            if (kopiujDoSchowka)
             {
-                System.Windows.Forms.Clipboard.SetText(gotoweHaslo);
+                try
+                {
+                    System.Windows.Forms.Clipboard.SetText(gotoweHaslo);
+                }
+                catch (Exception ex)
+                {
+                    // Wyświetlamy ostrzeżenie, jeśli Windows zablokuje dostęp do schowka
+                    System.Windows.Forms.MessageBox.Show(
+                        "Hasło zostało wygenerowane, ale system zablokował automatyczne skopiowanie go do schowka.\nMusisz skopiować je ręcznie.\n\nSzczegóły: " + ex.Message,
+                        "Błąd schowka",
+                        System.Windows.Forms.MessageBoxButtons.OK,
+                        System.Windows.Forms.MessageBoxIcon.Warning);
+                }
             }
-            catch (Exception ex)
-            {
-                // Wyświetlamy ostrzeżenie, jeśli Windows zablokuje dostęp do schowka
-                System.Windows.Forms.MessageBox.Show(
-                    "Hasło zostało wygenerowane, ale system zablokował automatyczne skopiowanie go do schowka.\nMusisz skopiować je ręcznie.\n\nSzczegóły: " + ex.Message,
-                    "Błąd schowka",
-                    System.Windows.Forms.MessageBoxButtons.OK,
-                    System.Windows.Forms.MessageBoxIcon.Warning);
-            }
-
             return gotoweHaslo;
         }
 
@@ -95,7 +97,7 @@ namespace Przychodnia
             }
         }
 
-        public static (bool CzySaBledy, string Komunikat) SprawdzSileHasla(string haslo, string login = "")
+        public static (bool CzySaBledy, string Komunikat) SprawdzSileHasla(string? haslo, string login = "")
         {
             if (string.IsNullOrEmpty(haslo)) return (true, "Hasło nie może być puste.");
 

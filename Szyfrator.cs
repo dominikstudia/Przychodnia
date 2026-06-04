@@ -11,7 +11,7 @@ namespace Przychodnia
 
         public static string Szyfruj(string jawnyTekst)
         {
-            if (string.IsNullOrEmpty(jawnyTekst)) return jawnyTekst;
+            if (string.IsNullOrWhiteSpace(jawnyTekst)) return jawnyTekst;
 
             using (Aes aesAlg = Aes.Create())
             {
@@ -34,7 +34,7 @@ namespace Przychodnia
 
         public static string Odszyfruj(string zaszyfrowanyTekst)
         {
-            if (string.IsNullOrEmpty(zaszyfrowanyTekst)) return zaszyfrowanyTekst;
+            if (string.IsNullOrWhiteSpace(zaszyfrowanyTekst)) return zaszyfrowanyTekst;
 
             try
             {
