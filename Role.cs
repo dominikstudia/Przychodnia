@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Przychodnia.modele;
+using System;
 using System.Collections.Generic;
 using System.Text;
 

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Przychodnia
+namespace Przychodnia.modele
 {
     public class Wizyta
     {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Przychodnia
+namespace Przychodnia.modele
 {
     public class Rola
     {

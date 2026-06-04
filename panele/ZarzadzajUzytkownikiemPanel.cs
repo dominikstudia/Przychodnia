@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Przychodnia.modele;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -132,6 +133,18 @@ namespace Przychodnia
                 return;
             }
 
+            var uzytkownicy = BazaDanych.Uzytkownicy;
+            if (uzytkownicy.Any(u => u.Login == textbox_login.Text))
+            {
+                MessageBox.Show("Taki login juz istnieje w bazie danych.");
+                return;
+            }
+            if (uzytkownicy.Any(u => u.Email == textbox_email.Text))
+            {
+                MessageBox.Show("Taki email juz istnieje w bazie danych.");
+                return;
+            }
+
             // Walidacja hasła (tylko jeśli pole jest aktywne i coś wpisano)
             if (textbox_haslo.Enabled && !string.IsNullOrEmpty(textbox_haslo.Text))
             {
@@ -224,7 +237,7 @@ namespace Przychodnia
         private void btn_anuluj_Click(object sender, EventArgs e)
         {
             Form okno = this.FindForm();
-            if (okno != null && okno.Name != "Form1") okno.Close();
+            if (okno != null && okno.Name != "Przychodnia") okno.Close();
             else this.Parent?.Controls.Remove(this);
         }
 

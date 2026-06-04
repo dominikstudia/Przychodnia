@@ -1,4 +1,5 @@
-﻿using Przychodnia.panele;
+﻿using Przychodnia.modele;
+using Przychodnia.panele;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
