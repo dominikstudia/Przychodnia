@@ -13,7 +13,7 @@ namespace Przychodnia
 {
     internal class BazaDanych
     {
-        public static readonly string POLACZENIE_STRING = @"Server=localhost\SQLEXPRESS;Database=Przychodnia;Trusted_Connection=True;TrustServerCertificate=True;";
+        public static readonly string POLACZENIE_STRING = @"Server=(localdb)\local;Database=Przychodnia;Trusted_Connection=True;TrustServerCertificate=True;";
 
         public static BindingList<Uzytkownik> Uzytkownicy { get; set; } = new BindingList<Uzytkownik>();
         public static Uzytkownik? ZALOGOWANY_UZYTKOWNIK { get; set; } = null;

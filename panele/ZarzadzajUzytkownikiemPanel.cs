@@ -126,22 +126,30 @@ namespace Przychodnia
                 }
             }
 
-            // Walidacja email
-            if (!Regex.IsMatch(textbox_email.Text, RegexPatterny.WALIDATOR_EMAIL))
+            int idOmijanego = _uzytkownik != null ? _uzytkownik.Id : -1;
+
+            if (BazaDanych.Uzytkownicy.Any(u => u.Login == textbox_login.Text && u.Id != idOmijanego))
             {
-                MessageBox.Show("Wprowadziłeś niepoprawny format emaila");
+                MessageBox.Show("Taki login już istnieje w bazie danych.", "Błąd", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
-            var uzytkownicy = BazaDanych.Uzytkownicy;
-            if (uzytkownicy.Any(u => u.Login == textbox_login.Text))
+            if (BazaDanych.CzyEmailZajety(textbox_email.Text, idOmijanego))
             {
-                MessageBox.Show("Taki login juz istnieje w bazie danych.");
+                MessageBox.Show("Taki email już istnieje w bazie danych.", "Błąd", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
-            if (uzytkownicy.Any(u => u.Email == textbox_email.Text))
+
+            if (BazaDanych.CzyPeselZajety(textbox_pesel.Text, idOmijanego))
             {
-                MessageBox.Show("Taki email juz istnieje w bazie danych.");
+                MessageBox.Show("Taki PESEL już istnieje w bazie danych.", "Błąd", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            var walidacjaPesel = Narzedzia.SprawdzPesel(textbox_pesel.Text, datetimerpicker_data_urodzenia.Value, combobox_plec.SelectedItem.ToString() == "Mężczyzna", false);
+            if (!walidacjaPesel.Poprawny)
+            {
+                MessageBox.Show(walidacjaPesel.Komunikat, "Błąd", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
@@ -165,20 +173,11 @@ namespace Przychodnia
                 }
             }
 
-            var walidacjaPesel = Narzedzia.SprawdzPesel(textbox_pesel.Text, datetimerpicker_data_urodzenia.Value, combobox_plec.SelectedItem.ToString() == "Mężczyzna", true);
-            if (!walidacjaPesel.Poprawny)
-            {
-                MessageBox.Show(walidacjaPesel.Komunikat, "Błąd", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            // Mapowanie danych na obiekt
             Uzytkownik uzytkownik = _uzytkownik ?? new Uzytkownik { Id = -1 };
 
-            // Ochrona danych dla recepcji: jeśli to edycja i robi to recepcja, nie zmieniamy loginu
             if (czyRecepcja && _uzytkownik != null)
             {
-                uzytkownik.Login = _uzytkownik.Login; // Przywracamy oryginał na wszelki wypadek
+                uzytkownik.Login = _uzytkownik.Login;
             }
             else
             {
@@ -198,13 +197,11 @@ namespace Przychodnia
             uzytkownik.NumerPosesji = textbox_numer_posesji.Text;
             uzytkownik.NumerLokalu = textbox_numer_lokalu.Text;
 
-            // Hasło zmieniamy tylko jeśli pole było aktywne i coś wpisano
             if (textbox_haslo.Enabled && !string.IsNullOrEmpty(textbox_haslo.Text))
             {
                 uzytkownik.Haslo = textbox_haslo.Text;
             }
 
-            // Tylko Admin zarządza rolami
             if (czyAdmin)
             {
                 uzytkownik.IdRol.Clear();
